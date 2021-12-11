@@ -5,7 +5,6 @@
  */
 package ftp.ltm;
 
-import static ftp.ltm.FTPserverForm.jLabel_recievedFile;
 import java.awt.Container;
 import java.awt.List;
 import java.io.BufferedReader;
@@ -22,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.LinkedHashMap;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,12 +36,14 @@ public class FTPclientFrom extends javax.swing.JFrame {
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
     public static String user;
+    private static LinkedHashMap<String, String> mapQuyenUser = null;
 
     /**
      * Creates new form client
      */
     public FTPclientFrom(String user) throws IOException {
         initComponents();
+        loadHashMap();
         this.user = user;
         start();
         loadDir(".\\FILE-SERVER\\" + user, list_file_user);
@@ -234,7 +237,16 @@ public class FTPclientFrom extends javax.swing.JFrame {
         if (txtGui.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên file");
         } else {
-            sendFile();
+            try {
+                if (checkUP()) {
+                    sendFile();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Bạn đã bị block UP");
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         }
 
     }//GEN-LAST:event_btGuiActionPerformed
@@ -254,8 +266,16 @@ public class FTPclientFrom extends javax.swing.JFrame {
         if (nameFile.equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên file");
         } else {
+            try {
+                if (checkDOWN()) {
+                    receiveFile(nameFile);
 
-            receiveFile(nameFile);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Bạn đã bị block DOWN");
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         }
 
@@ -394,6 +414,53 @@ public class FTPclientFrom extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Nhận file thất bại");
         }
+    }
+
+    public void loadHashMap() throws FileNotFoundException {
+        mapQuyenUser = new LinkedHashMap<String, String>();
+        String url = ".\\src\\ftp\\ltm\\quyen_user.txt";
+        // Đọc dữ liệu từ File với Scanner
+        FileInputStream fileInputStream = new FileInputStream(url);
+        Scanner scanner = new Scanner(fileInputStream);
+        StringTokenizer st = null;
+
+        try {
+            while (scanner.hasNextLine()) {
+                //System.out.println(scanner.nextLine());
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                String username = st.nextToken();
+                String up = st.nextToken();
+                String down = st.nextToken();
+                mapQuyenUser.put(username, username + ";" + up + ";" + down);
+            }
+
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+
+            }
+        }
+
+    }
+
+    public boolean checkUP() throws FileNotFoundException {
+        loadHashMap();
+        String quyen = mapQuyenUser.get(user);
+        if (quyen.equals(user + ";yes;yes") || quyen.equals(user + ";yes;no")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkDOWN() throws FileNotFoundException {
+        loadHashMap();
+        String quyen = mapQuyenUser.get(user);
+        if (quyen.equals(user + ";yes;yes") || quyen.equals(user + ";no;yes")) {
+            return true;
+        }
+        return false;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btGui;

@@ -12,16 +12,26 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import static java.util.Collections.list;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -34,10 +44,15 @@ public class FTPserverForm extends javax.swing.JFrame {
     private static Socket socket = null;
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
+    private static LinkedHashMap<String, String> mapQuyenUser = null;
 
-    public FTPserverForm() {
+    public FTPserverForm() throws FileNotFoundException {
         initComponents();
-
+        loadComboboxUser();
+        loadTableUser();
+        loadHashMap();
+        pack();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -50,35 +65,59 @@ public class FTPserverForm extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel_status = new javax.swing.JLabel();
-        jLabel_client = new javax.swing.JLabel();
-        jLabel_recievedFile = new javax.swing.JLabel();
+        jComboBox_user = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable_user = new javax.swing.JTable();
+        jButton_ok = new javax.swing.JButton();
+        jCheckBox_block_up = new javax.swing.JCheckBox();
+        jCheckBox_block_down = new javax.swing.JCheckBox();
+        jButton_lammoi = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(new java.awt.Point(0, 0));
 
-        jLabel1.setFont(new java.awt.Font("Arial", 0, 48)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Arial", 3, 48)); // NOI18N
         jLabel1.setText("Server");
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel2.setText("Status :");
+        jComboBox_user.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
+        jComboBox_user.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox_user.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox_userActionPerformed(evt);
+            }
+        });
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel3.setText("Client Connection:");
+        jTable_user.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel4.setText("Recieved File :");
+            },
+            new String [] {
+                "Username ", "UPload ", "Download"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable_user);
 
-        jLabel_status.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel_status.setText("Server running");
+        jButton_ok.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
+        jButton_ok.setText("OK");
+        jButton_ok.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_okActionPerformed(evt);
+            }
+        });
 
-        jLabel_client.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel_client.setText("no new Client");
+        jCheckBox_block_up.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
+        jCheckBox_block_up.setText("block UP");
 
-        jLabel_recievedFile.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel_recievedFile.setText("no file recieved");
+        jCheckBox_block_down.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
+        jCheckBox_block_down.setText("block DOWN");
+
+        jButton_lammoi.setFont(new java.awt.Font("Tahoma", 3, 16)); // NOI18N
+        jButton_lammoi.setText("Làm mới");
+        jButton_lammoi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_lammoiActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -87,42 +126,93 @@ public class FTPserverForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(141, 141, 141)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(45, 45, 45)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel_recievedFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel_status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel_client, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(24, Short.MAX_VALUE))
+                        .addComponent(jComboBox_user, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox_block_up)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox_block_down)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton_ok, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGap(132, 132, 132)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton_lammoi))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 526, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton_lammoi)
+                        .addGap(6, 6, 6)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel_status))
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel_client))
-                .addGap(42, 42, 42)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel_recievedFile))
+                    .addComponent(jComboBox_user, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCheckBox_block_down)
+                    .addComponent(jCheckBox_block_up)
+                    .addComponent(jButton_ok))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_okActionPerformed
+        String quyen = String.valueOf(jComboBox_user.getSelectedItem());
+        if (jCheckBox_block_up.isSelected()) {
+            quyen += ";no;";
+        } else {
+            quyen += ";yes;";
+        }
+        if (jCheckBox_block_down.isSelected()) {
+            quyen += "no";
+        } else {
+            quyen += "yes";
+        }
+        mapQuyenUser.put(String.valueOf(jComboBox_user.getSelectedItem()), quyen);
+        try {
+            FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\quyen_user.txt");
+            Set<String> keySet = mapQuyenUser.keySet();
+            for (String key : keySet) {
+                fw.write(mapQuyenUser.get(key) + "\n");
+            }
+            fw.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        try {
+            loadTableUser();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FTPserverForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jButton_okActionPerformed
+
+    private void jComboBox_userActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox_userActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox_userActionPerformed
+
+    private void jButton_lammoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_lammoiActionPerformed
+        try {
+            loadComboboxUser();
+            loadTableUser();
+            loadHashMap();
+        } catch (Exception e) {
+        }
+     }//GEN-LAST:event_jButton_lammoiActionPerformed
 
     /**
      * @param args the command line arguments
@@ -138,16 +228,24 @@ public class FTPserverForm extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FTPserverForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FTPserverForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FTPserverForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FTPserverForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FTPserverForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FTPserverForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FTPserverForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FTPserverForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
@@ -155,7 +253,13 @@ public class FTPserverForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FTPserverForm().setVisible(true);
+                try {
+                    new FTPserverForm().setVisible(true);
+
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(FTPserverForm.class
+                            .getName()).log(Level.SEVERE, null, ex);
+                }
 
             }
         });
@@ -172,14 +276,103 @@ public class FTPserverForm extends javax.swing.JFrame {
         }
     }
 
+    public void loadComboboxUser() throws FileNotFoundException {
+        String url = ".\\src\\ftp\\ltm\\quyen_user.txt";
+        // Đọc dữ liệu từ File với Scanner
+        FileInputStream fileInputStream = new FileInputStream(url);
+        Scanner scanner = new Scanner(fileInputStream);
+        StringTokenizer st = null;
+
+        DefaultComboBoxModel username = (DefaultComboBoxModel) jComboBox_user.getModel();
+        username.removeAllElements();
+        try {
+            while (scanner.hasNextLine()) {
+                //System.out.println(scanner.nextLine());
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                username.addElement(st.nextElement());
+            }
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+
+            }
+        }
+    }
+
+    public void loadTableUser() throws FileNotFoundException {
+        String url = ".\\src\\ftp\\ltm\\quyen_user.txt";
+        // Đọc dữ liệu từ File với Scanner
+        FileInputStream fileInputStream = new FileInputStream(url);
+        Scanner scanner = new Scanner(fileInputStream);
+        StringTokenizer st = null;
+        DefaultTableModel tableUser = (DefaultTableModel) jTable_user.getModel();
+        tableUser.getDataVector().removeAllElements();
+        revalidate();
+
+        try {
+            while (scanner.hasNextLine()) {
+                //System.out.println(scanner.nextLine());
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                String username = st.nextToken();
+                String up = st.nextToken();
+                String down = st.nextToken();
+                tableUser.addRow(new Object[]{
+                    username, up, down
+                });
+
+            }
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+
+            }
+        }
+
+    }
+
+    public void loadHashMap() throws FileNotFoundException {
+        mapQuyenUser = new LinkedHashMap<String, String>();
+        String url = ".\\src\\ftp\\ltm\\quyen_user.txt";
+        // Đọc dữ liệu từ File với Scanner
+        FileInputStream fileInputStream = new FileInputStream(url);
+        Scanner scanner = new Scanner(fileInputStream);
+        StringTokenizer st = null;
+
+        try {
+            while (scanner.hasNextLine()) {
+                //System.out.println(scanner.nextLine());
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                String username = st.nextToken();
+                String up = st.nextToken();
+                String down = st.nextToken();
+                mapQuyenUser.put(username, username + ";" + up + ";" + down);
+            }
+
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+
+            }
+        }
+
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton_lammoi;
+    private javax.swing.JButton jButton_ok;
+    private javax.swing.JCheckBox jCheckBox_block_down;
+    private javax.swing.JCheckBox jCheckBox_block_up;
+    private javax.swing.JComboBox<String> jComboBox_user;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    public static javax.swing.JLabel jLabel_client;
-    public static javax.swing.JLabel jLabel_recievedFile;
-    public static javax.swing.JLabel jLabel_status;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable_user;
     // End of variables declaration//GEN-END:variables
 
 }
@@ -203,7 +396,7 @@ class transferfile extends Thread {
         }
     }
 
-    public void receiveFile(String user,String url) throws FileNotFoundException, IOException {
+    public void receiveFile(String user, String url) throws FileNotFoundException, IOException {
 
 //        in = socket.getInputStream(); // nhận file 
         //C:\Users\theph\OneDrive\Máy tính\test.txt
@@ -213,7 +406,7 @@ class transferfile extends Thread {
             System.out.println(st.nextToken());
             nameFile = st.nextToken(); //lấy tên file
         }
-        File f = new File(".\\FILE-SERVER\\" +user+"\\"+ nameFile);
+        File f = new File(".\\FILE-SERVER\\" + user + "\\" + nameFile);
         FileOutputStream fout = new FileOutputStream(f);
         int ch;
         String temp;
@@ -228,8 +421,8 @@ class transferfile extends Thread {
         System.out.println("Server đã nhận file");
     }
 
-    public void sendFile(String user,String nameFile) {
-        String urlDir = ".\\FILE-SERVER\\"+user+"\\";
+    public void sendFile(String user, String nameFile) {
+        String urlDir = ".\\FILE-SERVER\\" + user + "\\";
 
         File file = new File(urlDir + nameFile);
 
@@ -270,13 +463,13 @@ class transferfile extends Thread {
                     String user = din.readUTF();
                     String urlFile = din.readUTF();
                     System.out.println(user);
-                    receiveFile(user,urlFile);
+                    receiveFile(user, urlFile);
                 }
                 if (line.equals("receive")) {
                     String user = din.readUTF();
                     String nameFile = din.readUTF();
                     System.out.println(user);
-                    sendFile(user,nameFile);
+                    sendFile(user, nameFile);
 
                 }
             } catch (Exception e) {

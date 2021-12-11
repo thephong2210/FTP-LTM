@@ -10,9 +10,17 @@ package ftp.ltm;
  * @author theph
  */
 public class User {
-    String username,pass,hoten,gioitinh,ngaysinh;
 
+    String username, pass, hoten, gioitinh, ngaysinh;
 
+    public User(String username, String pass, String hoten, String gioitinh, String ngaysinh) {
+        this.username = username;
+        this.pass = pass;
+        this.hoten = hoten;
+        this.gioitinh = gioitinh;
+        this.ngaysinh = ngaysinh;
+
+    }
 
     public String getUsername() {
         return username;
@@ -54,13 +62,4 @@ public class User {
         this.ngaysinh = ngaysinh;
     }
 
-    public User(String username, String pass, String hoten, String gioitinh, String ngaysinh) {
-        this.username = username;
-        this.pass = pass;
-        this.hoten = hoten;
-        this.gioitinh = gioitinh;
-        this.ngaysinh = ngaysinh;
-    }
-    
-    
 }

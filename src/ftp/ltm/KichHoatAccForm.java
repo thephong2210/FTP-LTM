@@ -154,7 +154,7 @@ public class KichHoatAccForm extends javax.swing.JFrame {
                 f.setLocationRelativeTo(null);
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 this.dispose();
-                
+
             } else if (jTextField_OTP.getText().equals("")) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập mã OTP");
 
@@ -206,8 +206,9 @@ public class KichHoatAccForm extends javax.swing.JFrame {
     }
 
     public void writeFile(User user) {
+        // ghi file info_user
         try {
-            String content = "\n"+user.username + ";" + user.pass + ";" + user.hoten + ";" + user.gioitinh + ";" + user.ngaysinh;
+            String content = user.username + ";" + user.pass + ";" + user.hoten + ";" + user.gioitinh + ";" + user.ngaysinh+"\n";
             //Specify the file name and path here
             File file = new File(".\\src\\ftp\\ltm\\info_user.txt");
 
@@ -226,7 +227,34 @@ public class KichHoatAccForm extends javax.swing.JFrame {
             //Closing BufferedWriter Stream
             bw.close();
 
-            System.out.println("Đã thêm tài khoản vào file");
+            System.out.println("Đã thêm tài khoản vào file info");
+
+        } catch (IOException ioe) {
+            System.out.println("Exception occurred:");
+            ioe.printStackTrace();
+        }
+        //ghi file quyen_user
+        try {
+            String content = user.username +";yes;yes\n";
+            //Specify the file name and path here
+            File file = new File(".\\src\\ftp\\ltm\\quyen_user.txt");
+
+            /* This logic is to create the file if the
+         * file is not already present
+             */
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            //Here true is to append the content to file
+            FileWriter fw = new FileWriter(file, true);
+            //BufferedWriter writer give better performance
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(content);
+            //Closing BufferedWriter Stream
+            bw.close();
+
+            System.out.println("Đã thêm tài khoản vào file quyền");
 
         } catch (IOException ioe) {
             System.out.println("Exception occurred:");
@@ -234,8 +262,9 @@ public class KichHoatAccForm extends javax.swing.JFrame {
         }
 
     }
-    public void createDir(String user){
-         File dir = new File(".//FILE-SERVER//"+user);
+
+    public void createDir(String user) {
+        File dir = new File(".//FILE-SERVER//" + user);
         if (dir.mkdir()) {
             System.out.println("Create directory " + dir.getAbsolutePath() + " success.");
         }
