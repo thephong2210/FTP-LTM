@@ -1,6 +1,7 @@
 # FTP-LTM
 Đồ án lập trình mạng FTP
 Những thứ chưa làm :
+
 client
 - validate : tạo tài khoản
 - chưa mã hoá pass
