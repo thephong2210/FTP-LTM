@@ -21,7 +21,7 @@ client
 dùng đó sẽ nhận được thông báo khi có người chia sẻ file/thư mục cho mình.
 
 server
-- Cho phép/block người dùng download/upload.
+- Cho phép/block người dùng download/upload. đã xong
 - Gán quyền user đối với thư mục. User chỉ được upload/download với các thư mục có quyền.
 - Cấu hình dung lượng lưu trữ tối đa của từng user. Kích thước file tối đa upload và download.
 - Cho phép/block chức năng anonymous với user bất kỳ.
