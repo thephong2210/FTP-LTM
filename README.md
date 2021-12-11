@@ -1,5 +1,14 @@
 # FTP-LTM
 Đồ án lập trình mạng FTP
+các bước chạy bài:
+
+- run file "FTPserverForm"
+- Nếu có tài khoản rồi thì run file "loginForm" để đăng nhập (thông tin tài khoản để trong file "info_user.txt")
+- Muốn đăng ký thì run file "registerForm" hoặc trong file "loginForm" cũng có nút đăng ký để chuyển qua  file "registerForm"
+- sau khi đăng nhập thành công thì nó chuyển qua giao diện file "FTPclientFrom" , ở đây sẻ hiện thị thư mục của user , thư mực trung ,
+- có thể up/down file lên mục của riêng user hoặc thư mục chung 
+- khi down file về thì file sẻ nằm trong "D:/FTP_receive"
+
 Những thứ chưa làm :
 
 client
