@@ -13,7 +13,7 @@ Những thứ chưa làm :
 
 client
 - validate : tạo tài khoản
-- chưa mã hoá pass
+- chưa mã hoá pass : bao gồn bên đăng nhập với bên đăng ký
 - tải lên file đã toàn tại : thông báo ghi đè hay ko
 - kiểm tra tài khoản đã đăng ký chưa : gmail
 - Có thể đăng nhập tài khoản anonymous để upload/download vào thư mục chung.
@@ -22,6 +22,6 @@ dùng đó sẽ nhận được thông báo khi có người chia sẻ file/thư
 
 server
 - Cho phép/block người dùng download/upload. đã xong
-- Gán quyền user đối với thư mục. User chỉ được upload/download với các thư mục có quyền.
-- Cấu hình dung lượng lưu trữ tối đa của từng user. Kích thước file tối đa upload và download.
-- Cho phép/block chức năng anonymous với user bất kỳ.
+- Gán quyền user đối với thư mục. User chỉ được upload/download với các thư mục có quyền.  đã xong
+- Cấu hình dung lượng lưu trữ tối đa của từng user. Kích thước file tối đa upload và download.  đã xong
+- Cho phép/block chức năng anonymous với user bất kỳ.  đã xong
