@@ -5,10 +5,7 @@
  */
 package ftp.ltm;
 
-import java.awt.Container;
 import java.awt.List;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -16,17 +13,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.LinkedHashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -35,40 +27,44 @@ public class FTPclientFrom extends javax.swing.JFrame {
     private static Socket socket = null;
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
-    public static String user;
+    public static String username;
     private static LinkedHashMap<String, String> mapQuyenUser = null;
 
     /**
      * Creates new form client
      */
-    public FTPclientFrom(String user) throws IOException {
+    public FTPclientFrom(String username, Socket socket) throws IOException, ClassNotFoundException {
         initComponents();
-        loadHashMap();
-        this.user = user;
-        start();
-        loadDir(".\\FILE-SERVER\\" + user, list_file_user);
-        loadDir(".\\FILE-SERVER\\chung", list_file_chung);
+        this.username = username;
+        this.socket = socket;
+        start(socket);
 
+        loadDir(username, list_file_user);
+        loadDir("chung", list_file_chung);
     }
 
-    public void start() {
+    public void start(Socket socket) {
         try {
-            socket = new Socket("localhost", 2210);
             din = new DataInputStream(socket.getInputStream());
             dout = new DataOutputStream(socket.getOutputStream());
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Chưa mở server");
         }
 
-        System.out.println(user);
+        System.out.println(username);
     }
 
-    private static void loadDir(String url, java.awt.List list) {
-        File dir = new File(url);
-        String[] listFile = dir.list();
+    private void loadDir(String username, java.awt.List list) throws IOException {
         list.clear();
-        for (int i = 0; i < listFile.length; i++) {
-            list.add(listFile[i]);
+        dout.writeUTF("reload");
+        dout.flush();
+        dout.writeUTF(username);
+        dout.flush();
+        String listFile = din.readUTF();
+        StringTokenizer st = new StringTokenizer(listFile, ":");
+        while (st.hasMoreElements()) {
+            list.add(st.nextToken());
         }
     }
 
@@ -83,17 +79,17 @@ public class FTPclientFrom extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        txtGui = new javax.swing.JTextField();
+        jtext_file = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jButton_Browse = new javax.swing.JButton();
         jButton_receiveFile_C = new javax.swing.JButton();
-        jProgressBar_FTP = new javax.swing.JProgressBar();
         btGui = new javax.swing.JButton();
         list_file_user = new java.awt.List();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         list_file_chung = new java.awt.List();
         jCheckBox_chung = new javax.swing.JCheckBox();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -118,8 +114,6 @@ public class FTPclientFrom extends javax.swing.JFrame {
                 jButton_receiveFile_CActionPerformed(evt);
             }
         });
-
-        jProgressBar_FTP.setFont(new java.awt.Font("Tahoma", 2, 24)); // NOI18N
 
         btGui.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
         btGui.setText("Send");
@@ -150,6 +144,14 @@ public class FTPclientFrom extends javax.swing.JFrame {
         jCheckBox_chung.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
         jCheckBox_chung.setText("File chung");
 
+        jButton1.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
+        jButton1.setText("Reload");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -159,33 +161,33 @@ public class FTPclientFrom extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(20, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap(25, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(185, 185, 185)
-                        .addComponent(jButton_receiveFile_C)
-                        .addGap(40, 40, 40)
-                        .addComponent(btGui)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(list_file_user, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(25, 25, 25)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(list_file_chung, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton1)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox_chung))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(list_file_user, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(25, 25, 25)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(list_file_chung, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jProgressBar_FTP, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(txtGui, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton_Browse))))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jtext_file, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton_Browse))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButton_receiveFile_C)
+                                .addGap(36, 36, 36)
+                                .addComponent(btGui)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox_chung)
+                                .addGap(68, 68, 68)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -195,18 +197,16 @@ public class FTPclientFrom extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtGui, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtext_file, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(jButton_Browse))
                 .addGap(30, 30, 30)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btGui)
-                        .addComponent(jCheckBox_chung))
-                    .addComponent(jButton_receiveFile_C))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar_FTP, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btGui)
+                    .addComponent(jCheckBox_chung)
+                    .addComponent(jButton_receiveFile_C)
+                    .addComponent(jButton1))
+                .addGap(40, 40, 40)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jLabel4))
@@ -234,16 +234,12 @@ public class FTPclientFrom extends javax.swing.JFrame {
     private void btGuiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btGuiActionPerformed
         // TODO add your handling code here:
 
-        if (txtGui.getText().equals("")) {
+        if (jtext_file.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên file");
         } else {
             try {
-                if (checkUP()) {
-                    sendFile();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Bạn đã bị block UP");
-                }
-            } catch (FileNotFoundException ex) {
+                sendFile();
+            } catch (Exception ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -256,24 +252,19 @@ public class FTPclientFrom extends javax.swing.JFrame {
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(jButton_Browse);
 
-        txtGui.setText(chooser.getSelectedFile().getAbsolutePath());
+        jtext_file.setText(chooser.getSelectedFile().getAbsolutePath());
 
     }//GEN-LAST:event_jButton_BrowseActionPerformed
 
     private void jButton_receiveFile_CActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_receiveFile_CActionPerformed
-        String nameFile = txtGui.getText();
+        String nameFile = jtext_file.getText();
 
         if (nameFile.equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên file");
         } else {
             try {
-                if (checkDOWN()) {
-                    receiveFile(nameFile);
-
-                } else {
-                    JOptionPane.showMessageDialog(this, "Bạn đã bị block DOWN");
-                }
-            } catch (FileNotFoundException ex) {
+                receiveFile(nameFile);
+            } catch (Exception ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -283,12 +274,25 @@ public class FTPclientFrom extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton_receiveFile_CActionPerformed
 
     private void list_file_userActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_list_file_userActionPerformed
-
+        jtext_file.setText(list_file_user.getSelectedItem());
+        jCheckBox_chung.setSelected(false);
     }//GEN-LAST:event_list_file_userActionPerformed
 
     private void list_file_chungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_list_file_chungActionPerformed
-        // TODO add your handling code here:
+        jtext_file.setText(list_file_chung.getSelectedItem());
+        jCheckBox_chung.setSelected(true);
     }//GEN-LAST:event_list_file_chungActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+        try {
+            loadDir(username, list_file_user);
+            loadDir("chung", list_file_chung);
+        } catch (IOException ex) {
+            Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -322,8 +326,10 @@ public class FTPclientFrom extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new FTPclientFrom(user).setVisible(true);
+                    new FTPclientFrom(username, socket).setVisible(true);
                 } catch (IOException ex) {
+                    Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
                     Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -331,11 +337,10 @@ public class FTPclientFrom extends javax.swing.JFrame {
 
     }
 
-    public void sendFile() {
-        String urlFile = txtGui.getText();
+    public void sendFile() throws FileNotFoundException {
+        String urlFile = jtext_file.getText();
         System.out.println(urlFile);
         File file = new File(urlFile);
-
         if (!file.exists()) {
 
             JOptionPane.showMessageDialog(this, "File not Exists...");
@@ -343,26 +348,70 @@ public class FTPclientFrom extends javax.swing.JFrame {
             try {
                 dout.writeUTF("send");
                 dout.flush();
-                if (jCheckBox_chung.isSelected()) {
-                    dout.writeUTF("chung");
-                    dout.flush();
-                } else {
-                    dout.writeUTF(user);
-                    dout.flush();
+                dout.writeUTF(username);
+                dout.flush();
+                String message = din.readUTF();
+                if (message.equals("UP")) {
+                    if (jCheckBox_chung.isSelected()) {
+                        dout.writeUTF("chung");
+                        dout.flush();
+
+                    } else {
+                        dout.writeUTF(username);
+                        dout.flush();
+                    }
+                    message = din.readUTF();
+                    System.out.println(message);
+                    if (message.equals("UPdirchung")) {
+
+                        dout.writeUTF(String.valueOf(file.length()));
+                        dout.flush();
+                        message = din.readUTF();
+                        if (!message.equals("ok")) {
+                            JOptionPane.showMessageDialog(this, message);
+                        } else {
+                            dout.writeUTF(urlFile);
+                            dout.flush();
+                            FileInputStream fin = new FileInputStream(file);
+                            int ch;
+                            do {
+                                ch = fin.read();
+                                dout.writeUTF(String.valueOf(ch));
+                            } while (ch != -1);
+                            fin.close();
+                            JOptionPane.showMessageDialog(this, "Send File success ");
+                            loadDir(username, list_file_user);
+                            loadDir("chung", list_file_chung);
+                        }
+                    } else if (message.equals("UPdir")) {
+
+                        dout.writeUTF(String.valueOf(file.length()));
+                        dout.flush();
+                        message = din.readUTF();
+                        if (!message.equals("ok")) {
+                            JOptionPane.showMessageDialog(this, message);
+                        } else {
+                            dout.writeUTF(urlFile);
+                            dout.flush();
+                            FileInputStream fin = new FileInputStream(file);
+                            int ch;
+                            do {
+                                ch = fin.read();
+                                dout.writeUTF(String.valueOf(ch));
+                            } while (ch != -1);
+                            fin.close();
+                            JOptionPane.showMessageDialog(this, "Send File success ");
+                            loadDir(username, list_file_user);
+                            loadDir("chung", list_file_chung);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Bạn đã bị block UP dir này ");
+                    }
+
+                } else if (message.equals("blockUP")) {
+                    JOptionPane.showMessageDialog(this, "Bạn đã bị block UP");
                 }
 
-                dout.writeUTF(urlFile);
-                dout.flush();
-                FileInputStream fin = new FileInputStream(file);
-                int ch;
-                do {
-                    ch = fin.read();
-                    dout.writeUTF(String.valueOf(ch));
-                } while (ch != -1);
-                fin.close();
-                JOptionPane.showMessageDialog(this, "Send File success ");
-                loadDir(".\\FILE-SERVER\\" + user, list_file_user);
-                loadDir(".\\FILE-SERVER\\chung", list_file_chung);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -370,6 +419,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
             }
 
         }
+
     }
 
     public void receiveFile(String nameFile) {
@@ -377,105 +427,77 @@ public class FTPclientFrom extends javax.swing.JFrame {
 
             dout.writeUTF("receive");
             dout.flush();
-            if (jCheckBox_chung.isSelected()) {
-                dout.writeUTF("chung");
-                dout.flush();
-            } else {
-                dout.writeUTF(user);
-                dout.flush();
-            }
-            dout.writeUTF(nameFile);
+            dout.writeUTF(username);
             dout.flush();
-
-            String line = din.readUTF();
-            if (line.equals("File not Exists")) {
-                JOptionPane.showMessageDialog(this, "Server : file không tồn tại");
-            } else if (line.equals("File Exists")) {
-                File dir = new File("D://FTP_receive");
-                if (dir.mkdir()) {
-                    System.out.println("Create directory " + dir.getAbsolutePath() + " success.");
+            String message = din.readUTF();
+            if (message.equals("down")) {
+                if (jCheckBox_chung.isSelected()) {
+                    dout.writeUTF("chung");
+                    dout.flush();
+                } else {
+                    dout.writeUTF(username);
+                    dout.flush();
                 }
-                File f = new File("D://FTP_receive//" + nameFile);
-                FileOutputStream fout = new FileOutputStream(f);
-                int ch;
-                String temp;
-                do {
-                    temp = din.readUTF();
-                    ch = Integer.parseInt(temp);
-                    if (ch != -1) {
-                        fout.write(ch);
+                message = din.readUTF();
+                if (message.equals("DOWdir")) {
+                    dout.writeUTF(nameFile);
+                    dout.flush();
+
+                    message = din.readUTF();
+                    if (message.equals("File not Exists")) {
+                        JOptionPane.showMessageDialog(this, "Server : file không tồn tại");
+                    } else if (message.equals("File Exists")) {
+                        message = din.readUTF();
+                        if (message.equals("ok")) {
+                            File dir = new File("D://FTP_receive");
+                            if (dir.mkdir()) {
+                                System.out.println("Create directory " + dir.getAbsolutePath() + " success.");
+                            }
+                            File f = new File("D://FTP_receive//" + nameFile);
+                            FileOutputStream fout = new FileOutputStream(f);
+                            int ch;
+                            String temp;
+                            do {
+                                temp = din.readUTF();
+                                ch = Integer.parseInt(temp);
+                                if (ch != -1) {
+                                    fout.write(ch);
+                                }
+                            } while (ch != -1);
+                            fout.close();
+                            JOptionPane.showMessageDialog(this, "Nhận file thành công\n File tải về nằm ở\n\tD:/FTP_receive");
+                            // System.out.println("Đã nhận");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "file lớn hơn giới hạn không thể tải về ");
+
+                        }
                     }
-                } while (ch != -1);
-                fout.close();
-                JOptionPane.showMessageDialog(this, "Nhận file thành công\n File tải về nằm ở\n\tD:/FTP_receive");
-                // System.out.println("Đã nhận");
-            }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Bạn đã bị block DOWN dir này ");
+                }
 
+            } else if (message.equals("blockdown")) {
+                JOptionPane.showMessageDialog(this, "Bạn đã bị block Down");
+            }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Nhận file thất bại");
+            JOptionPane.showMessageDialog(this, "Nhận file thất bại, server lỗi");
         }
     }
 
-    public void loadHashMap() throws FileNotFoundException {
-        mapQuyenUser = new LinkedHashMap<String, String>();
-        String url = ".\\src\\ftp\\ltm\\quyen_user.txt";
-        // Đọc dữ liệu từ File với Scanner
-        FileInputStream fileInputStream = new FileInputStream(url);
-        Scanner scanner = new Scanner(fileInputStream);
-        StringTokenizer st = null;
-
-        try {
-            while (scanner.hasNextLine()) {
-                //System.out.println(scanner.nextLine());
-                st = new StringTokenizer(scanner.nextLine(), ";");
-                String username = st.nextToken();
-                String up = st.nextToken();
-                String down = st.nextToken();
-                mapQuyenUser.put(username, username + ";" + up + ";" + down);
-            }
-
-        } finally {
-            try {
-                scanner.close();
-                fileInputStream.close();
-            } catch (IOException ex) {
-
-            }
-        }
-
-    }
-
-    public boolean checkUP() throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(user);
-        if (quyen.equals(user + ";yes;yes") || quyen.equals(user + ";yes;no")) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean checkDOWN() throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(user);
-        if (quyen.equals(user + ";yes;yes") || quyen.equals(user + ";no;yes")) {
-            return true;
-        }
-        return false;
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btGui;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton_Browse;
     private javax.swing.JButton jButton_receiveFile_C;
-    private static javax.swing.JCheckBox jCheckBox_chung;
+    private javax.swing.JCheckBox jCheckBox_chung;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JProgressBar jProgressBar_FTP;
-    private static java.awt.List list_file_chung;
-    private static java.awt.List list_file_user;
-    private javax.swing.JTextField txtGui;
+    private javax.swing.JTextField jtext_file;
+    private java.awt.List list_file_chung;
+    private java.awt.List list_file_user;
     // End of variables declaration//GEN-END:variables
 
 }

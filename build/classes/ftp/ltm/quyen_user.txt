@@ -1,1 +1,1 @@
-admin;yes;yes
+admin;yes;yes;yes;yes;1000;100;100

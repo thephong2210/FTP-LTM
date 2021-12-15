@@ -6,9 +6,12 @@
 package ftp.ltm;
 
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -25,12 +28,17 @@ public class KichHoatAccForm extends javax.swing.JFrame {
      */
     static String OTP;
     static User User;
+    private static Socket socket = null;
+    private static DataInputStream din = null;
+    private static DataOutputStream dout = null;
     Thread threadTimeOut;
 
-    public KichHoatAccForm(String OTP, User user) {
+    public KichHoatAccForm(String OTP, User user, Socket socket) {
         initComponents();
         this.OTP = OTP;
         this.User = user;
+        this.socket = socket;
+        start(socket);
         // time out 10p
         threadTimeOut = new Thread() {
             @Override
@@ -59,6 +67,15 @@ public class KichHoatAccForm extends javax.swing.JFrame {
 
         };
         threadTimeOut.start();
+    }
+
+    public void start(Socket socket) {
+        try {
+            din = new DataInputStream(socket.getInputStream());
+            dout = new DataOutputStream(socket.getOutputStream());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Chưa mở server");
+        }
     }
 
     /**
@@ -146,9 +163,16 @@ public class KichHoatAccForm extends javax.swing.JFrame {
         } else {
             if (jTextField_OTP.getText().equals(OTP)) {
                 JOptionPane.showMessageDialog(this, "Tài khoản kích hoạt thành công ");
-                writeFile(User);
-                createDir(User.username);
-                loginForm f = new loginForm();
+                String info_user = User.username + ";" + User.pass + ";" + User.hoten + ";" + User.gioitinh + ";" + User.ngaysinh;
+                try {
+                    dout.writeUTF(info_user);
+                    dout.flush();
+                    dout.writeUTF(User.username);
+                    dout.flush();
+                } catch (IOException ex) {
+                    Logger.getLogger(KichHoatAccForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                loginForm f = new loginForm(socket);
                 f.setVisible(true);
                 f.pack();
                 f.setLocationRelativeTo(null);
@@ -198,7 +222,7 @@ public class KichHoatAccForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new KichHoatAccForm(OTP, User).setVisible(true);
+                new KichHoatAccForm(OTP, User, socket).setVisible(true);
 
             }
         });
@@ -208,7 +232,7 @@ public class KichHoatAccForm extends javax.swing.JFrame {
     public void writeFile(User user) {
         // ghi file info_user
         try {
-            String content = user.username + ";" + user.pass + ";" + user.hoten + ";" + user.gioitinh + ";" + user.ngaysinh+"\n";
+            String content = user.username + ";" + user.pass + ";" + user.hoten + ";" + user.gioitinh + ";" + user.ngaysinh + "\n";
             //Specify the file name and path here
             File file = new File(".\\src\\ftp\\ltm\\info_user.txt");
 
@@ -235,7 +259,7 @@ public class KichHoatAccForm extends javax.swing.JFrame {
         }
         //ghi file quyen_user
         try {
-            String content = user.username +";yes;yes\n";
+            String content = user.username + ";yes;yes;yes;yes;1000;100;100\n";
             //Specify the file name and path here
             File file = new File(".\\src\\ftp\\ltm\\quyen_user.txt");
 

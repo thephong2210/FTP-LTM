@@ -5,8 +5,9 @@
  */
 package ftp.ltm;
 
-import java.text.DecimalFormat;
-import java.util.Random;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -18,11 +19,26 @@ import javax.swing.JOptionPane;
  */
 public class registerForm extends javax.swing.JFrame {
 
+    private static Socket socket = null;
+    private static DataInputStream din = null;
+    private static DataOutputStream dout = null;
+
     /**
      * Creates new form registerForm
      */
-    public registerForm() {
+    public registerForm(Socket socket) {
         initComponents();
+        this.socket = socket;
+        start(socket);
+    }
+
+    public void start(Socket socket) {
+        try {
+            din = new DataInputStream(socket.getInputStream());
+            dout = new DataOutputStream(socket.getOutputStream());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Chưa mở server");
+        }
     }
 
     /**
@@ -203,7 +219,7 @@ public class registerForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jRadioButton_nuActionPerformed
 
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        loginForm f = new loginForm();
+        loginForm f = new loginForm(socket);
         f.setVisible(true);
         f.pack();
         f.setLocationRelativeTo(null);
@@ -233,11 +249,15 @@ public class registerForm extends javax.swing.JFrame {
         if (!ms.equals("")) {
             JOptionPane.showMessageDialog(this, ms);
         } else {
-            String otp = new DecimalFormat("000000").format(new Random().nextInt(999999));
-            System.out.println(otp);
+            String otp = "";
             try {
+                dout.writeUTF("register");
+                dout.flush();
+                dout.writeUTF(jTextField_username.getText());
+                dout.flush();
                 JOptionPane.showMessageDialog(this, "Đang gửi OTP qua email của bạn .Vui lòng chờ tí nha");
-                // sendMail.sendMail("ftpltm2021@gmail.com", "Mã OTP của bạn : " + otp);
+                otp = din.readUTF();
+                System.out.println(otp);
                 JOptionPane.showMessageDialog(this, "Đã gửi mã OTP qua email");
             } catch (Exception ex) {
                 Logger.getLogger(registerForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -254,8 +274,8 @@ public class registerForm extends javax.swing.JFrame {
             ngaysinh = jDateChooser_ngaysinh.getDate().toString();
             System.out.println(gioitinh);
 
-            User user = new User(username,pass,hoten,gioitinh,ngaysinh);
-            KichHoatAccForm kichHoatAccForm = new KichHoatAccForm(otp,user);
+            User user = new User(username, pass, hoten, gioitinh, ngaysinh);
+            KichHoatAccForm kichHoatAccForm = new KichHoatAccForm(otp, user, socket);
             kichHoatAccForm.setVisible(true);
             //kichHoatAccForm.pack();
             kichHoatAccForm.setLocationRelativeTo(null);
@@ -297,7 +317,7 @@ public class registerForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new registerForm().setVisible(true);
+                new registerForm(socket).setVisible(true);
             }
         });
     }

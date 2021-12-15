@@ -5,11 +5,9 @@
  */
 package ftp.ltm;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -21,11 +19,33 @@ import javax.swing.JOptionPane;
  */
 public class loginForm extends javax.swing.JFrame {
 
+    private static Socket socket = null;
+    private static DataInputStream din = null;
+    private static DataOutputStream dout = null;
+
     /**
      * Creates new form loginForm
      */
-    public loginForm() {
+    public loginForm(Socket s) {
         initComponents();
+        start(s);
+    }
+
+    public void start(Socket s) {
+        try {
+            if (s == null) {
+                socket = new Socket("localhost", 2210);
+            } else {
+                socket = s;
+            }
+
+            din = new DataInputStream(socket.getInputStream());
+            dout = new DataOutputStream(socket.getOutputStream());
+            System.out.println("Đã kết nối tới server");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Chưa mở server");
+        }
+
     }
 
     /**
@@ -156,10 +176,19 @@ public class loginForm extends javax.swing.JFrame {
         } else {
             String user = jTextField_username.getText();
             String pass = jTextField_pass.getText();
+
             try {
-                if (checkLogin(user, pass)) {
+                dout.writeUTF("login");
+                dout.flush();
+                dout.writeUTF(user);
+                dout.flush();
+                dout.writeUTF(pass);
+                dout.flush();
+                String message = din.readUTF();
+
+                if (message.equals("ok")) {
                     JOptionPane.showMessageDialog(this, "Đăng nhập thành công");
-                    FTPclientFrom client = new FTPclientFrom(user);
+                    FTPclientFrom client = new FTPclientFrom(user, socket);
                     client.setVisible(true);
                     client.pack();
                     client.setLocationRelativeTo(null);
@@ -169,9 +198,7 @@ public class loginForm extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(this, "Đăng nhập thất bại\n vui lòng kiểm tra lại tài khoản hay mật khẩu");
                 }
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(loginForm.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(loginForm.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -179,7 +206,7 @@ public class loginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
-        registerForm f = new registerForm();
+        registerForm f = new registerForm(socket);
         f.setVisible(true);
         f.pack();
         f.setLocationRelativeTo(null);
@@ -218,42 +245,10 @@ public class loginForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new loginForm().setVisible(true);
+                new loginForm(socket).setVisible(true);
             }
         });
     }
-
-    public static boolean checkLogin(String username, String pass) throws FileNotFoundException {
-
-        String url = ".\\src\\ftp\\ltm\\info_user.txt";
-        // Đọc dữ liệu từ File với Scanner
-        FileInputStream fileInputStream = new FileInputStream(url);
-        Scanner scanner = new Scanner(fileInputStream);
-        StringTokenizer st = null;
-
-        try {
-            while (scanner.hasNextLine()) {
-                //System.out.println(scanner.nextLine());
-                st = new StringTokenizer(scanner.nextLine(), ";");
-                String temp1 = st.nextToken();
-                String temp2 = st.nextToken();
-                if (temp1.equals(username) && temp2.equals(pass)) {
-                    return true;
-                }
-
-            }
-        } finally {
-            try {
-                scanner.close();
-                fileInputStream.close();
-            } catch (IOException ex) {
-
-            }
-        }
-        return false;
-
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;

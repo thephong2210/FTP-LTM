@@ -42,7 +42,7 @@ public class sendMail {
             }
         });
 
-        Message message = prepareMessage(session, myAcc, recepient,otp);
+        Message message = prepareMessage(session, myAcc, recepient, otp);
 
         Transport.send(message);
         System.out.println("Gửi thành công");
