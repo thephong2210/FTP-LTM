@@ -10,6 +10,8 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -233,12 +235,35 @@ public class registerForm extends javax.swing.JFrame {
         if (jTextField_username.getText().equals("")) {
             ms += "Email chưa điền \n";
         }
+       // String regex = "^[a-zA-z][a-zA-Z0-9]+@[a-zA-Z]+(\\.[a-zA-Z]+){1,3}$";
+       String regex = "^[a-zA-z][a-zA-Z0-9]+@gmail+(\\.com+)$";
+        Pattern pattern = Pattern.compile(regex);
+	    Matcher matcher = pattern.matcher(jTextField_username.getText());
+    	if(!matcher.matches()) {
+    		ms += "Email không hợp lệ \n";
+    	}
         if (jTextField_pass.getText().equals("")) {
             ms += "Pass chưa điền \n";
         }
+        
+        String regex1 = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+
+         Pattern pattern1 = Pattern.compile(regex1);
+ 	    Matcher matcher1 = pattern1.matcher(jTextField_pass.getText());
+     	if(!matcher1.matches()) {
+     		ms += "Pass không hợp lệ \n";
+     	}
         if (jTextField_hoten.getText().equals("")) {
             ms += "Họ tên chưa điền \n";
         }
+        String regex2 = "^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\\s]+$";
+        		
+        Pattern pattern2 = Pattern.compile(regex2);
+	    Matcher matcher2 = pattern2.matcher(jTextField_hoten.getText());
+    	if(!matcher2.matches()) {
+    		ms += "Họ tên không chứa số và kí tự đặc biệt \n";
+    	}
+    
         if (!jRadioButton_nam.isSelected() && !jRadioButton_nu.isSelected()) {
             ms += "Giới tính chưa điền \n";
         }

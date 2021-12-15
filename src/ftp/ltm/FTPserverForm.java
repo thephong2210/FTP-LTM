@@ -26,6 +26,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -261,6 +264,14 @@ public class FTPserverForm extends javax.swing.JFrame {
             quyen += "yes";
         }
         String dungluong = jTextField_dungluong.getText();
+        String regex = "^[0-9]$";
+        String ms = "";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(jTextField_dungluong.getText());
+        if (!matcher.matches()) {
+            ms += "Chỉ được nhập số \n";
+            JOptionPane.showMessageDialog(this, ms);
+        }
         String max_up = jTextField_maxUP.getText();
         String max_down = jTextField_maxDOWN.getText();
         quyen += ";" + dungluong + ";" + max_up + ";" + max_down;
@@ -542,22 +553,46 @@ class transferfile extends Thread {
         StringTokenizer st = new StringTokenizer(url, "\\");
         String nameFile = null;
         while (st.hasMoreTokens()) {
-            System.out.println(st.nextToken());
+
             nameFile = st.nextToken(); //lấy tên file
         }
         File f = new File(".\\FILE-SERVER\\" + user + "\\" + nameFile);
-        FileOutputStream fout = new FileOutputStream(f);
-        int ch;
-        String temp;
-        do {
-            temp = din.readUTF();
-            ch = Integer.parseInt(temp);
-            if (ch != -1) {
-                fout.write(ch);
+        if (f.exists()) {
+            dout.writeUTF("file_exists");
+            dout.flush();
+            String message = din.readUTF();
+            if (message.equals("ghi_de")) {
+                FileOutputStream fout = new FileOutputStream(f);
+                int ch;
+                String temp;
+                do {
+                    temp = din.readUTF();
+                    ch = Integer.parseInt(temp);
+                    if (ch != -1) {
+                        fout.write(ch);
+                    }
+                } while (ch != -1);
+                fout.close();
+                System.out.println("Server đã nhận file");
             }
-        } while (ch != -1);
-        fout.close();
-        System.out.println("Server đã nhận file");
+
+        } else {
+            dout.writeUTF("file_not_exists");
+            dout.flush();
+            FileOutputStream fout = new FileOutputStream(f);
+            int ch;
+            String temp;
+            do {
+                temp = din.readUTF();
+                ch = Integer.parseInt(temp);
+                if (ch != -1) {
+                    fout.write(ch);
+                }
+            } while (ch != -1);
+            fout.close();
+            System.out.println("Server đã nhận file");
+        }
+
     }
 
     public void sendFile(String user, String dir, String nameFile) {
@@ -947,7 +982,17 @@ class transferfile extends Thread {
                 }
 
             } catch (Exception e) {
-                System.out.println("Lỗi không xác định");
+                System.out.println("client đã rời khỏi");
+                try {
+
+                    dout.close();
+                    din.close();
+                    ClientSoc.close();
+                    break;
+                } catch (IOException ex) {
+                    Logger.getLogger(transferfile.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
             }
         }
     }

@@ -372,16 +372,42 @@ public class FTPclientFrom extends javax.swing.JFrame {
                         } else {
                             dout.writeUTF(urlFile);
                             dout.flush();
-                            FileInputStream fin = new FileInputStream(file);
-                            int ch;
-                            do {
-                                ch = fin.read();
-                                dout.writeUTF(String.valueOf(ch));
-                            } while (ch != -1);
-                            fin.close();
-                            JOptionPane.showMessageDialog(this, "Send File success ");
-                            loadDir(username, list_file_user);
-                            loadDir("chung", list_file_chung);
+                            message = din.readUTF();
+                            if (message.equals("file_exists")) {
+                                int n = JOptionPane.showConfirmDialog(this, "File đã tồn tại, bạn có muốn ghi đè ?",
+                                        "Alert",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (n == JOptionPane.YES_OPTION) {
+                                    dout.writeUTF("ghi_de");
+                                    dout.flush();
+                                    FileInputStream fin = new FileInputStream(file);
+                                    int ch;
+                                    do {
+                                        ch = fin.read();
+                                        dout.writeUTF(String.valueOf(ch));
+                                    } while (ch != -1);
+                                    fin.close();
+                                    JOptionPane.showMessageDialog(this, "Send File success ");
+                                    loadDir(username, list_file_user);
+                                    loadDir("chung", list_file_chung);
+                                } else {
+                                    dout.writeUTF("khong_ghi_de");
+                                    dout.flush();
+                                }
+
+                            } else {
+                                FileInputStream fin = new FileInputStream(file);
+                                int ch;
+                                do {
+                                    ch = fin.read();
+                                    dout.writeUTF(String.valueOf(ch));
+                                } while (ch != -1);
+                                fin.close();
+                                JOptionPane.showMessageDialog(this, "Send File success ");
+                                loadDir(username, list_file_user);
+                                loadDir("chung", list_file_chung);
+                            }
+
                         }
                     } else if (message.equals("UPdir")) {
 
@@ -393,16 +419,41 @@ public class FTPclientFrom extends javax.swing.JFrame {
                         } else {
                             dout.writeUTF(urlFile);
                             dout.flush();
-                            FileInputStream fin = new FileInputStream(file);
-                            int ch;
-                            do {
-                                ch = fin.read();
-                                dout.writeUTF(String.valueOf(ch));
-                            } while (ch != -1);
-                            fin.close();
-                            JOptionPane.showMessageDialog(this, "Send File success ");
-                            loadDir(username, list_file_user);
-                            loadDir("chung", list_file_chung);
+                            message = din.readUTF();
+                            if (message.equals("file_exists")) {
+                                int n = JOptionPane.showConfirmDialog(this, "File đã tồn tại, bạn có muốn ghi đè ?",
+                                        "Alert",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (n == JOptionPane.YES_OPTION) {
+                                    dout.writeUTF("ghi_de");
+                                    dout.flush();
+                                    FileInputStream fin = new FileInputStream(file);
+                                    int ch;
+                                    do {
+                                        ch = fin.read();
+                                        dout.writeUTF(String.valueOf(ch));
+                                    } while (ch != -1);
+                                    fin.close();
+                                    JOptionPane.showMessageDialog(this, "Send File success ");
+                                    loadDir(username, list_file_user);
+                                    loadDir("chung", list_file_chung);
+                                } else {
+                                    dout.writeUTF("khong_ghi_de");
+                                    dout.flush();
+                                }
+
+                            } else {
+                                FileInputStream fin = new FileInputStream(file);
+                                int ch;
+                                do {
+                                    ch = fin.read();
+                                    dout.writeUTF(String.valueOf(ch));
+                                } while (ch != -1);
+                                fin.close();
+                                JOptionPane.showMessageDialog(this, "Send File success ");
+                                loadDir(username, list_file_user);
+                                loadDir("chung", list_file_chung);
+                            }
                         }
                     } else {
                         JOptionPane.showMessageDialog(this, "Bạn đã bị block UP dir này ");
