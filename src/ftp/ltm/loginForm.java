@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
  * @author theph
  */
 public class loginForm extends javax.swing.JFrame {
-
+    
     private static Socket socket = null;
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
@@ -30,7 +30,7 @@ public class loginForm extends javax.swing.JFrame {
         initComponents();
         start(s);
     }
-
+    
     public void start(Socket s) {
         try {
             if (s == null) {
@@ -38,14 +38,14 @@ public class loginForm extends javax.swing.JFrame {
             } else {
                 socket = s;
             }
-
+            
             din = new DataInputStream(socket.getInputStream());
             dout = new DataOutputStream(socket.getOutputStream());
-            System.out.println("Đã kết nối tới server");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Chưa mở server");
+            System.exit(0);
         }
-
+        
     }
 
     /**
@@ -154,7 +154,7 @@ public class loginForm extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String ms = "";
-
+        
         if (jTextField_username.getText().equals("")) {
             ms += "Email chưa điền \n";
         }
@@ -166,7 +166,7 @@ public class loginForm extends javax.swing.JFrame {
         } else {
             String user = jTextField_username.getText();
             String pass = jPasswordField.getText();
-
+            
             try {
                 dout.writeUTF("login");
                 dout.flush();
@@ -175,7 +175,7 @@ public class loginForm extends javax.swing.JFrame {
                 dout.writeUTF(pass);
                 dout.flush();
                 String message = din.readUTF();
-
+                
                 if (message.equals("ok")) {
                     JOptionPane.showMessageDialog(this, "Đăng nhập thành công");
                     FTPclientFrom client = new FTPclientFrom(user, socket);
@@ -184,14 +184,14 @@ public class loginForm extends javax.swing.JFrame {
                     client.setLocationRelativeTo(null);
                     client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     this.dispose();
-
+                    
                 } else {
                     JOptionPane.showMessageDialog(this, "Đăng nhập thất bại\n vui lòng kiểm tra lại tài khoản hay mật khẩu");
                 }
             } catch (Exception ex) {
                 Logger.getLogger(loginForm.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -200,7 +200,7 @@ public class loginForm extends javax.swing.JFrame {
         f.setVisible(true);
         f.pack();
         f.setLocationRelativeTo(null);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.dispose();
 
     }//GEN-LAST:event_jLabel4MouseClicked

@@ -8,36 +8,43 @@ package ftp.ltm;
 import com.toedter.calendar.JTextFieldDateEditor;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author theph
  */
-public class registerForm extends javax.swing.JFrame {
+public class update_infoForm extends javax.swing.JFrame {
 
     private static Socket socket = null;
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
+    private static String username = null;
 
     /**
-     * Creates new form registerForm
+     * Creates new form update_infoForm
      */
-    public registerForm(Socket socket) {
+    public update_infoForm(Socket socket, String username) throws IOException, ParseException {
         initComponents();
         this.socket = socket;
+        this.username = username;
+        jLabel_username.setText(username);
         // chặn người dùng nhập ngày sinh
         JTextFieldDateEditor editor = (JTextFieldDateEditor) jDateChooser_ngaysinh.getDateEditor();
         editor.setEditable(false);
         start(socket);
+        loadInfo();
     }
 
     public void start(Socket socket) {
@@ -49,6 +56,29 @@ public class registerForm extends javax.swing.JFrame {
         }
     }
 
+    public void loadInfo() throws IOException, ParseException {
+        dout.writeUTF("get_info");
+        dout.flush();
+        dout.writeUTF(username);
+        dout.flush();
+        String info_user = din.readUTF();
+        StringTokenizer st = new StringTokenizer(info_user, ";");
+        st.nextToken(); // bỏ qua user name vì mình đã có rồi
+        st.nextToken(); // bỏ qua pass vì nó đã hash
+        String hoten = st.nextToken();
+        String gioitinh = st.nextToken();
+        String ngaysinh = st.nextToken();
+        jTextField_hoten.setText(hoten);
+        if (gioitinh.equals("Nam")) {
+            jRadioButton_nam.setSelected(rootPaneCheckingEnabled);
+        } else {
+            jRadioButton_nu.setSelected(rootPaneCheckingEnabled);
+        }
+        Date date1 = new SimpleDateFormat("MMM d,yyyy").parse(ngaysinh);
+        jDateChooser_ngaysinh.setDate(date1);
+
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,32 +88,22 @@ public class registerForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup_gioTinh = new javax.swing.ButtonGroup();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jTextField_username = new javax.swing.JTextField();
         jTextField_hoten = new javax.swing.JTextField();
         jTextField_pass = new javax.swing.JTextField();
         jRadioButton_nam = new javax.swing.JRadioButton();
         jRadioButton_nu = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
         jDateChooser_ngaysinh = new com.toedter.calendar.JDateChooser();
+        jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel_username = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel1.setText("Username :");
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel2.setText("Password :");
-
-        jLabel3.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel3.setText("Giới tính :");
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
         jLabel4.setText("Họ tên :");
@@ -92,13 +112,7 @@ public class registerForm extends javax.swing.JFrame {
         jLabel5.setText("Ngày sinh :");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 3, 36)); // NOI18N
-        jLabel6.setText("Register");
-
-        jTextField_username.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField_usernameActionPerformed(evt);
-            }
-        });
+        jLabel6.setText("update information");
 
         jTextField_hoten.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -112,10 +126,10 @@ public class registerForm extends javax.swing.JFrame {
             }
         });
 
-        buttonGroup_gioTinh.add(jRadioButton_nam);
+        buttonGroup1.add(jRadioButton_nam);
         jRadioButton_nam.setText("Nam");
 
-        buttonGroup_gioTinh.add(jRadioButton_nu);
+        buttonGroup1.add(jRadioButton_nu);
         jRadioButton_nu.setText("Nữ");
         jRadioButton_nu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -123,51 +137,53 @@ public class registerForm extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
+        jLabel1.setText("Username :");
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
+        jLabel2.setText("Password :");
+
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton1.setText("Register");
+        jButton1.setText("update");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jLabel7.setText("Click here to login");
-        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel7MouseClicked(evt);
-            }
-        });
+        jLabel3.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
+        jLabel3.setText("Giới tính :");
+
+        jLabel_username.setFont(new java.awt.Font("Tahoma", 2, 18)); // NOI18N
+        jLabel_username.setText("username");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jButton1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel7))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jRadioButton_nam)
-                            .addGap(34, 34, 34)
-                            .addComponent(jRadioButton_nu))
-                        .addComponent(jTextField_hoten, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField_pass, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField_username, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jDateChooser_ngaysinh, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 28, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jRadioButton_nam)
+                                .addGap(34, 34, 34)
+                                .addComponent(jRadioButton_nu))
+                            .addComponent(jDateChooser_ngaysinh, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(jTextField_hoten, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField_pass, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel_username, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -176,7 +192,9 @@ public class registerForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(11, 11, 11)
-                        .addComponent(jLabel1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel_username))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15)
@@ -186,9 +204,7 @@ public class registerForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel5))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField_username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(8, 8, 8)
+                        .addGap(52, 52, 52)
                         .addComponent(jTextField_pass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField_hoten, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -199,20 +215,12 @@ public class registerForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jDateChooser_ngaysinh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jLabel7))
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        jRadioButton_nu.getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jTextField_usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_usernameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField_usernameActionPerformed
 
     private void jTextField_hotenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_hotenActionPerformed
         // TODO add your handling code here:
@@ -226,51 +234,11 @@ public class registerForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jRadioButton_nuActionPerformed
 
-    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        loginForm f = new loginForm(socket);
-        f.setVisible(true);
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.dispose();
-    }//GEN-LAST:event_jLabel7MouseClicked
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String ms = "";
 
-        if (jTextField_username.getText().equals("")) {
-            ms += "Email chưa điền \n";
-        } else {
-            String regex = "^[a-zA-z][a-zA-Z0-9]+@gmail+(\\.com+)$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(jTextField_username.getText());
-            if (!matcher.matches()) {
-                ms += "Email không hợp lệ \n";
-            } else {
-                try {
-                    dout.writeUTF("checkUsernameExists");
-                    dout.flush();
-                    dout.writeUTF(jTextField_username.getText());
-                    dout.flush();
-                    String message = din.readUTF();
-                    if (message.equals("exists")) {
-                        ms += "Email đã tồn tại \n";
-                    }
-                } catch (Exception e) {
-                }
-
-            }
-        }
-
         if (jTextField_pass.getText().equals("")) {
             ms += "Pass chưa điền \n";
-        } else {
-         String regex1 = "^(?=\\S+$).{8,}$";
-         Pattern pattern1 = Pattern.compile(regex1);
- 	    Matcher matcher1 = pattern1.matcher(jTextField_pass.getText());
-     	if(!matcher1.matches()) {
-     		ms += "Pass không chứa khoản trắng và ít nhất 8 kí tự \n";
-     	}
         }
 
         if (jTextField_hoten.getText().equals("")) {
@@ -296,21 +264,9 @@ public class registerForm extends javax.swing.JFrame {
         if (!ms.equals("")) {
             JOptionPane.showMessageDialog(this, ms);
         } else {
-            String otp = "";
-            try {
-                dout.writeUTF("register");
-                dout.flush();
-                dout.writeUTF(jTextField_username.getText());
-                dout.flush();
-                JOptionPane.showMessageDialog(this, "Đang gửi OTP qua email của bạn .Vui lòng chờ tí nha");
-                otp = din.readUTF();
-                System.out.println(otp);
-                JOptionPane.showMessageDialog(this, "Đã gửi mã OTP qua email");
-            } catch (Exception ex) {
-                Logger.getLogger(registerForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
             String username, pass, hoten, gioitinh, ngaysinh;
-            username = jTextField_username.getText();
+            username = jLabel_username.getText();
             pass = jTextField_pass.getText();
             hoten = jTextField_hoten.getText();
             if (jRadioButton_nam.isSelected()) {
@@ -320,17 +276,26 @@ public class registerForm extends javax.swing.JFrame {
             }
             Date date = jDateChooser_ngaysinh.getDate();
             ngaysinh = DateFormat.getDateInstance().format(date);
-            User user = new User(username, pass, hoten, gioitinh, ngaysinh);
-            KichHoatAccForm kichHoatAccForm = new KichHoatAccForm(otp, user, socket);
-            kichHoatAccForm.setVisible(true);
-            //kichHoatAccForm.pack();
-            kichHoatAccForm.setLocationRelativeTo(null);
-            kichHoatAccForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-            this.dispose();
+            String info_user = hoten + ";" + gioitinh + ";" + ngaysinh;
+
+            try {
+                dout.writeUTF("update_information");
+                dout.flush();
+                dout.writeUTF(username);
+                dout.flush();
+                dout.writeUTF(pass);
+                dout.flush();
+                dout.writeUTF(info_user);
+                dout.flush();
+                String message = din.readUTF();
+                if (message.equals("updated")) {
+                    JOptionPane.showMessageDialog(rootPane, "update thành công");
+                }
+            } catch (Exception e) {
+            }
 
         }
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -350,26 +315,32 @@ public class registerForm extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(registerForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(update_infoForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(registerForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(update_infoForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(registerForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(update_infoForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(registerForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(update_infoForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new registerForm(socket).setVisible(true);
+                try {
+                    new update_infoForm(socket, username).setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(update_infoForm.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                    Logger.getLogger(update_infoForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup_gioTinh;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
     private com.toedter.calendar.JDateChooser jDateChooser_ngaysinh;
     private javax.swing.JLabel jLabel1;
@@ -378,11 +349,10 @@ public class registerForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel_username;
     private javax.swing.JRadioButton jRadioButton_nam;
     private javax.swing.JRadioButton jRadioButton_nu;
     private javax.swing.JTextField jTextField_hoten;
     private javax.swing.JTextField jTextField_pass;
-    private javax.swing.JTextField jTextField_username;
     // End of variables declaration//GEN-END:variables
 }

@@ -6,6 +6,7 @@
 package ftp.ltm;
 
 import static ftp.ltm.FTPserverForm.loadHashMap;
+import static ftp.ltm.FTPserverForm.mapInfoUser;
 import static ftp.ltm.FTPserverForm.mapQuyenUser;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -47,6 +48,7 @@ public class FTPserverForm extends javax.swing.JFrame {
     private static DataOutputStream dout = null;
 
     public static LinkedHashMap<String, String> mapQuyenUser = null;
+    public static LinkedHashMap<String, String> mapInfoUser = null;
 
     public FTPserverForm() throws FileNotFoundException {
         initComponents();
@@ -241,6 +243,31 @@ public class FTPserverForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public boolean check() {
+        if (jTextField_dungluong.getText().equals("") || jTextField_maxDOWN.getText().equals("") || jTextField_maxUP.getText().equals("")) {
+            return false;
+        }
+        String regex = "\\d*";
+        // String ms = "";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(jTextField_dungluong.getText());
+        Matcher matcher1 = pattern.matcher(jTextField_maxDOWN.getText());
+        Matcher matcher2 = pattern.matcher(jTextField_maxUP.getText());
+        if (!matcher.matches()) {
+
+            return false;
+        }
+        if (!matcher1.matches()) {
+
+            return false;
+        }
+        if (!matcher2.matches()) {
+
+            return false;
+        }
+
+        return true;
+    }
     private void jButton_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_okActionPerformed
         int row = jTable_user.getSelectedRow();
         TableModel model = jTable_user.getModel();
@@ -266,35 +293,32 @@ public class FTPserverForm extends javax.swing.JFrame {
         } else {
             quyen += "yes";
         }
-        String dungluong = jTextField_dungluong.getText();
-        String regex = "^[0-9]$";
-        String ms = "";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(jTextField_dungluong.getText());
-        if (!matcher.matches()) {
-            ms += "Chỉ được nhập số \n";
-            JOptionPane.showMessageDialog(this, ms);
-        }
-        String max_up = jTextField_maxUP.getText();
-        String max_down = jTextField_maxDOWN.getText();
-        quyen += ";" + dungluong + ";" + max_up + ";" + max_down;
-        mapQuyenUser.put(username, quyen);
-        try {
-            FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\quyen_user.txt");
-            Set<String> keySet = mapQuyenUser.keySet();
-            for (String key : keySet) {
-                fw.write(mapQuyenUser.get(key) + "\n");
-            }
-            fw.close();
+        if (check()) {
+            String dungluong = jTextField_dungluong.getText();
+            String max_up = jTextField_maxUP.getText();
+            String max_down = jTextField_maxDOWN.getText();
+            quyen += ";" + dungluong + ";" + max_up + ";" + max_down;
+            mapQuyenUser.put(username, quyen);
+            try {
+                FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\quyen_user.txt");
+                Set<String> keySet = mapQuyenUser.keySet();
+                for (String key : keySet) {
+                    fw.write(mapQuyenUser.get(key) + "\n");
+                }
+                fw.close();
 
-        } catch (Exception e) {
-            System.out.println(e);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            try {
+                loadTableUser();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(FTPserverForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Chỉ được nhập số");
         }
-        try {
-            loadTableUser();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FTPserverForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
 
     }//GEN-LAST:event_jButton_okActionPerformed
 
@@ -445,6 +469,7 @@ public class FTPserverForm extends javax.swing.JFrame {
     }
 
     public static void loadHashMap() throws FileNotFoundException {
+        // load file quyền vào mapQuyenUser
         mapQuyenUser = new LinkedHashMap<String, String>();
         String url = ".\\src\\ftp\\ltm\\quyen_user.txt";
         // Đọc dữ liệu từ File với Scanner
@@ -454,7 +479,6 @@ public class FTPserverForm extends javax.swing.JFrame {
 
         try {
             while (scanner.hasNextLine()) {
-                //System.out.println(scanner.nextLine());
                 st = new StringTokenizer(scanner.nextLine(), ";");
                 String username = st.nextToken();
                 String up = st.nextToken();
@@ -465,6 +489,35 @@ public class FTPserverForm extends javax.swing.JFrame {
                 String max_up = st.nextToken();
                 String max_down = st.nextToken();
                 mapQuyenUser.put(username, username + ";" + up + ";" + down + ";" + Dir_user + ";" + Dir_chung + ";" + dungluong + ";" + max_up + ";" + max_down);
+            }
+
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+
+            }
+        }
+
+        // load file info vào mapInfoUser
+        mapInfoUser = new LinkedHashMap<String, String>();
+        url = ".\\src\\ftp\\ltm\\info_user.txt";
+        // Đọc dữ liệu từ File với Scanner
+        fileInputStream = new FileInputStream(url);
+        scanner = new Scanner(fileInputStream);
+        st = null;
+
+        try {
+            //  username, pass, hoten, gioitinh, ngaysinh;
+            while (scanner.hasNextLine()) {
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                String username = st.nextToken();
+                String pass = st.nextToken();
+                String hoten = st.nextToken();
+                String gioitinh = st.nextToken();
+                String ngaysinh = st.nextToken();
+                mapInfoUser.put(username, username + ";" + pass + ";" + hoten + ";" + gioitinh + ";" + ngaysinh);
             }
 
         } finally {
@@ -577,7 +630,7 @@ class transferfile extends Thread {
                 st = new StringTokenizer(scanner.nextLine(), ";");
                 String temp1 = st.nextToken();
                 if (temp1.equals(username)) {
-                    return false;
+                    return true;
                 }
             }
         } finally {
@@ -588,6 +641,23 @@ class transferfile extends Thread {
             }
         }
         return true;
+    }
+
+    public boolean updateInfo(String username, String pass, String info) throws NoSuchAlgorithmException {
+        pass = MaHoaMatKhau(pass);
+        mapInfoUser.put(username, username + ";" + pass + ";" + info);
+        try {
+            FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\info_user.txt");
+            Set<String> keySet = mapQuyenUser.keySet();
+            for (String key : keySet) {
+                fw.write(mapInfoUser.get(key) + "\n");
+            }
+            fw.close();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return false;
     }
 
     public void receiveFile(String user, String url) throws FileNotFoundException, IOException {
@@ -909,7 +979,7 @@ class transferfile extends Thread {
 
         while (true) {
             try {
-                String line = din.readUTF();
+                String line = din.readUTF(); // đợi yêu cầu 
                 if (line.equals("login")) {
                     String user = din.readUTF();
                     String pass = din.readUTF();
@@ -936,7 +1006,7 @@ class transferfile extends Thread {
                 }
                 if (line.equals("checkUsernameExists")) {
                     String username = din.readUTF();
-                    if (checkUsernameExists(username)) {
+                    if (!checkUsernameExists(username)) {
                         dout.writeUTF("not_exists");
                         dout.flush();
                     } else {
@@ -944,11 +1014,29 @@ class transferfile extends Thread {
                         dout.flush();
                     }
                 }
+                if (line.equals("get_info")) {
+                    String username = din.readUTF();
+                    loadHashMap();
+                    dout.writeUTF(mapInfoUser.get(username));
+                    dout.flush();
+
+                }
+                if (line.equals("update_information")) {
+                    String username = din.readUTF();
+                    String pass = din.readUTF();
+                    String info_user = din.readUTF();
+                    if (updateInfo(username, pass, info_user)) {
+                        dout.writeUTF("updated");
+                        dout.flush();
+                    } else {
+                        dout.writeUTF("no_update");
+                        dout.flush();
+                    }
+                }
                 if (line.equals("reload")) {
                     String username = din.readUTF();
                     dout.writeUTF(loadDirForUser(username));
                     dout.flush();
-
                 }
                 if (line.equals("send")) {
                     String user = din.readUTF();
