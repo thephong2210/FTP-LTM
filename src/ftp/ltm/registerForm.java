@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.apache.commons.validator.routines.EmailValidator;
 
 /**
  *
@@ -241,10 +242,11 @@ public class registerForm extends javax.swing.JFrame {
         if (jTextField_username.getText().equals("")) {
             ms += "Email chưa điền \n";
         } else {
-            String regex = "^[a-zA-z][a-zA-Z0-9]+@gmail+(\\.com+)$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(jTextField_username.getText());
-            if (!matcher.matches()) {
+//            String regex = "^[a-zA-z][a-zA-Z0-9]+@gmail+(\\.com+)$";
+//            Pattern pattern = Pattern.compile(regex);
+//            Matcher matcher = pattern.matcher(jTextField_username.getText());
+//            
+            if (!EmailValidator.getInstance().isValid(jTextField_username.getText())) {
                 ms += "Email không hợp lệ \n";
             } else {
                 try {

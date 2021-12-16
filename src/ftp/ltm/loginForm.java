@@ -31,6 +31,7 @@ public class loginForm extends javax.swing.JFrame {
         start(s);
     }
     
+    //27.74.196.100
     public void start(Socket s) {
         try {
             if (s == null) {

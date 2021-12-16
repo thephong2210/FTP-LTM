@@ -3,13 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/FTPclientFrom.java</file>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/info_user.txt</file>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/FTPserverForm.java</file>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/registerForm.java</file>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/quyen_user.txt</file>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/loginForm.java</file>
-            <file>file:/D:/Projects/NetBeansProjects/FTP-LTM/src/ftp/ltm/update_infoForm.java</file>
+            <file>file:/D:/Study/HK1_Nam4/LapTrinhMang/FTP-LTM/src/ftp/ltm/registerForm.java</file>
+            <file>file:/D:/Study/HK1_Nam4/LapTrinhMang/FTP-LTM/src/ftp/ltm/FTPserverForm.java</file>
+            <file>file:/D:/Study/HK1_Nam4/LapTrinhMang/FTP-LTM/src/ftp/ltm/loginForm.java</file>
+            <file>file:/D:/Study/HK1_Nam4/LapTrinhMang/FTP-LTM/src/ftp/ltm/FTPclientFrom.java</file>
         </group>
     </open-files>
 </project-private>

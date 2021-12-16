@@ -640,7 +640,7 @@ class transferfile extends Thread {
             } catch (IOException ex) {
             }
         }
-        return true;
+        return false;
     }
 
     public boolean updateInfo(String username, String pass, String info) throws NoSuchAlgorithmException {
@@ -1006,12 +1006,13 @@ class transferfile extends Thread {
                 }
                 if (line.equals("checkUsernameExists")) {
                     String username = din.readUTF();
-                    if (!checkUsernameExists(username)) {
-                        dout.writeUTF("not_exists");
-                        dout.flush();
-                    } else {
+                    if (checkUsernameExists(username)) {
                         dout.writeUTF("exists");
                         dout.flush();
+                    } else {
+                        dout.writeUTF("not_exists");
+                        dout.flush();
+                        
                     }
                 }
                 if (line.equals("get_info")) {
