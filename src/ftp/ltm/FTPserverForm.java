@@ -18,6 +18,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.Random;
@@ -31,6 +33,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -515,22 +518,27 @@ class transferfile extends Thread {
         }
     }
 
-    public static boolean checkLogin(String username, String pass) throws FileNotFoundException {
+    public boolean checkLogin(String username, String pass) throws FileNotFoundException, NoSuchAlgorithmException {
 
         String url = ".\\src\\ftp\\ltm\\info_user.txt";
         // Đọc dữ liệu từ File với Scanner
         FileInputStream fileInputStream = new FileInputStream(url);
         Scanner scanner = new Scanner(fileInputStream);
         StringTokenizer st = null;
+        pass = MaHoaMatKhau(pass);
 
         try {
             while (scanner.hasNextLine()) {
-                //System.out.println(scanner.nextLine());
-                st = new StringTokenizer(scanner.nextLine(), ";");
-                String temp1 = st.nextToken();
-                String temp2 = st.nextToken();
-                if (temp1.equals(username) && temp2.equals(pass)) {
-                    return true;
+
+                try {
+                    st = new StringTokenizer(scanner.nextLine(), ";");
+                    String temp1 = st.nextToken();
+                    String temp2 = st.nextToken();
+                    if (temp1.equals(username) && temp2.equals(pass)) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    System.out.println("file có khoảng trắng");
                 }
 
             }
@@ -544,6 +552,42 @@ class transferfile extends Thread {
         }
         return false;
 
+    }
+
+    public String MaHoaMatKhau(String password) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        String myHash = DatatypeConverter
+                .printHexBinary(digest).toUpperCase();
+        return myHash;
+    }
+
+    public boolean checkUsernameExists(String username) throws FileNotFoundException {
+
+        String url = ".\\src\\ftp\\ltm\\info_user.txt";
+        // Đọc dữ liệu từ File với Scanner
+        FileInputStream fileInputStream = new FileInputStream(url);
+        Scanner scanner = new Scanner(fileInputStream);
+        StringTokenizer st = null;
+
+        try {
+            while (scanner.hasNextLine()) {
+                //System.out.println(scanner.nextLine());
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                String temp1 = st.nextToken();
+                if (temp1.equals(username)) {
+                    return false;
+                }
+            }
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+            }
+        }
+        return true;
     }
 
     public void receiveFile(String user, String url) throws FileNotFoundException, IOException {
@@ -641,8 +685,18 @@ class transferfile extends Thread {
         }
     }
 
-    public void writeFile(String info_user, String name_user) {
-        // ghi file info_user
+    public void writeFile(String info_user, String name_user) throws NoSuchAlgorithmException {
+        StringTokenizer st = new StringTokenizer(info_user, ";");
+        st.nextToken(); // bỏ qua user name
+        String pass = st.nextToken(); // lấy cái pass để mã hoá
+        pass = MaHoaMatKhau(pass);
+        String thongtinconlai = "";
+        while (st.hasMoreElements()) {
+            thongtinconlai += ";" + st.nextToken();
+        }
+        String info_user_new = name_user + ";" + pass + thongtinconlai; // sau khi mã hoá pass
+
+// ghi file info_user
         try {
 
             //Specify the file name and path here
@@ -659,7 +713,7 @@ class transferfile extends Thread {
             FileWriter fw = new FileWriter(file, true);
             //BufferedWriter writer give better performance
             BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(info_user + "\n");
+            bw.write(info_user_new + "\n");
             //Closing BufferedWriter Stream
             bw.close();
 
@@ -862,9 +916,6 @@ class transferfile extends Thread {
                     if (checkLogin(user, pass)) {
                         dout.writeUTF("ok");
                         dout.flush();
-//                        String[] listFile = loadDirForUser(user);
-//                        objectOutput.writeObject(listFile);
-
                     } else {
                         dout.writeUTF("no ok");
                         dout.flush();
@@ -872,16 +923,26 @@ class transferfile extends Thread {
 
                 }
                 if (line.equals("register")) {
-                    String user = din.readUTF();
-                    // phải viết thêm 1 hàm kiểm tra user đã tồn tại chưa nữa
+                    String username = din.readUTF();
                     String otp = new DecimalFormat("000000").format(new Random().nextInt(999999));
+                    sendMail.sendMail(username, "Mã OTP của bạn : " + otp);
                     dout.writeUTF(otp);
                     dout.flush();
                     String info_user = din.readUTF();
                     String name_user = din.readUTF();
-                    // sendMail.sendMail("ftpltm2021@gmail.com", "Mã OTP của bạn : " + otp);
+
                     writeFile(info_user, name_user);
                     createDir(name_user);
+                }
+                if (line.equals("checkUsernameExists")) {
+                    String username = din.readUTF();
+                    if (checkUsernameExists(username)) {
+                        dout.writeUTF("not_exists");
+                        dout.flush();
+                    } else {
+                        dout.writeUTF("exists");
+                        dout.flush();
+                    }
                 }
                 if (line.equals("reload")) {
                     String username = din.readUTF();

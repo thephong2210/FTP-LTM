@@ -5,6 +5,7 @@
  */
 package ftp.ltm;
 
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -44,16 +45,18 @@ public class KichHoatAccForm extends javax.swing.JFrame {
             @Override
             public void run() {
                 int phut = 9;
-                int giay = 59;
+                int giay = 60;
                 while (phut >= 0) {
+
                     while (giay >= 0) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(KichHoatAccForm.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        jLabel_timeOUT.setText(phut + " : " + giay);
                         giay--;
+                        jLabel_timeOUT.setText(phut + " : " + giay);
+
                     }
                     phut--;
                     giay = 59;
@@ -159,7 +162,8 @@ public class KichHoatAccForm extends javax.swing.JFrame {
         String time = jLabel_timeOUT.getText();
 
         if (time.equals("Hết Giờ")) {
-            JOptionPane.showMessageDialog(this, "Hết thời gian 10p");
+            JOptionPane.showMessageDialog(this, "Hết thời gian 10p\n bạn sẻ bị đóng chương trình");
+            this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
         } else {
             if (jTextField_OTP.getText().equals(OTP)) {
                 JOptionPane.showMessageDialog(this, "Tài khoản kích hoạt thành công ");
