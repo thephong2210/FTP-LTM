@@ -673,7 +673,16 @@ class transferfile extends Thread {
     }
 
     public boolean updateInfo(String username, String pass, String info) throws NoSuchAlgorithmException {
-        pass = MaHoaMatKhau(pass);
+        System.out.println(info);
+        if (pass.equals("")) {
+
+            StringTokenizer st = new StringTokenizer(mapInfoUser.get(username), ";");
+            st.nextToken();
+            pass = st.nextToken(); // lấy cái pass cũ
+        } else {
+            pass = MaHoaMatKhau(pass);
+        }
+
         mapInfoUser.put(username, username + ";" + pass + ";" + info);
         try {
             FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\info_user.txt");
@@ -777,7 +786,7 @@ class transferfile extends Thread {
                         } while (ch != -1);
                         fin.close();
                         System.out.println("server đã gửi file");
-                    }else{
+                    } else {
                         System.out.println("client ko tải nữa");
                     }
 

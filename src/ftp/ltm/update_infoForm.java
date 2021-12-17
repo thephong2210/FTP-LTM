@@ -66,6 +66,7 @@ public class update_infoForm extends javax.swing.JFrame {
         StringTokenizer st = new StringTokenizer(info_user, ";");
         st.nextToken(); // bỏ qua user name vì mình đã có rồi
         pass = st.nextToken();
+        System.out.println(pass);
         String hoten = st.nextToken();
         String gioitinh = st.nextToken();
         String ngaysinh = st.nextToken();
@@ -252,11 +253,13 @@ public class update_infoForm extends javax.swing.JFrame {
             Pattern pattern1 = Pattern.compile(regex1);
             Matcher matcher1 = pattern1.matcher(jTextField_pass.getText());
             if (!matcher1.matches()) {
-                ms += "Pass không chứa khoản trắng và ít nhất 8 kí tự \n";
+                ms += "Pass không chứa khoản trắng và ít nhất 8 kí tự \nĐể trống là không thay đổi pass";
             } else {
                 pass = jTextField_pass.getText();
 
             }
+        }else{
+            pass = "";
         }
 
         if (jTextField_hoten.getText().equals("")) {
@@ -295,7 +298,7 @@ public class update_infoForm extends javax.swing.JFrame {
             ngaysinh = DateFormat.getDateInstance().format(date);
 
             String info_user = hoten + ";" + gioitinh + ";" + ngaysinh;
-
+            System.out.println(pass);
             try {
                 dout.writeUTF("update_information");
                 dout.flush();
@@ -309,6 +312,7 @@ public class update_infoForm extends javax.swing.JFrame {
                 if (message.equals("updated")) {
                     JOptionPane.showMessageDialog(rootPane, "update thành công");
                 }
+                this.dispose();
             } catch (Exception e) {
             }
 
