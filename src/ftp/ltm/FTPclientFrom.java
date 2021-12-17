@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class FTPclientFrom extends javax.swing.JFrame {
-    
+
     private static Socket socket = null;
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
@@ -41,32 +41,36 @@ public class FTPclientFrom extends javax.swing.JFrame {
         this.socket = socket;
         start(socket);
         loadData(username);
-        
+
     }
-    
+
     public void start(Socket socket) {
         try {
             din = new DataInputStream(socket.getInputStream());
             dout = new DataOutputStream(socket.getOutputStream());
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Chưa mở server");
         }
-        
+
         System.out.println(username);
     }
-    
+
     public void loadData(String user) throws IOException {
         if (!user.equals("anonymous")) {
             loadDir(username, list_file_user);
+
         } else {
             jCheckBox_chung.setSelected(rootPaneCheckingEnabled);
-            jCheckBox_chung.show(false);
+            jCheckBox_chung.setVisible(false);
             jButton_sua_thongtin.show(false);
+            list_file_user.setVisible(false);
+            jLabel_dirUser.setVisible(false);
+            
         }
         loadDir("chung", list_file_chung);
     }
-    
+
     private void loadDir(String username, java.awt.List list) throws IOException {
         list.clear();
         dout.writeUTF("reload");
@@ -97,7 +101,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
         jButton_receiveFile_C = new javax.swing.JButton();
         btGui = new javax.swing.JButton();
         list_file_user = new java.awt.List();
-        jLabel3 = new javax.swing.JLabel();
+        jLabel_dirUser = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         list_file_chung = new java.awt.List();
         jCheckBox_chung = new javax.swing.JCheckBox();
@@ -146,8 +150,8 @@ public class FTPclientFrom extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
-        jLabel3.setText("Thư mục của user (server)");
+        jLabel_dirUser.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
+        jLabel_dirUser.setText("Thư mục của user (server)");
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 3, 24)); // NOI18N
         jLabel4.setText("Thư mục chung");
@@ -207,12 +211,14 @@ public class FTPclientFrom extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(list_file_user, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel_dirUser, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jButton1)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                                        .addGap(211, 211, 211))
                                     .addComponent(list_file_chung, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(128, 128, 128)
@@ -258,7 +264,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     .addComponent(jButton1))
                 .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
+                    .addComponent(jLabel_dirUser)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -297,7 +303,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
             } catch (Exception ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
 
     }//GEN-LAST:event_btGuiActionPerformed
@@ -306,14 +312,14 @@ public class FTPclientFrom extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(jButton_Browse);
-        
+
         jtext_file.setText(chooser.getSelectedFile().getAbsolutePath());
 
     }//GEN-LAST:event_jButton_BrowseActionPerformed
 
     private void jButton_receiveFile_CActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_receiveFile_CActionPerformed
         String nameFile = jtext_file.getText();
-        
+
         if (nameFile.equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên file");
         } else {
@@ -322,9 +328,9 @@ public class FTPclientFrom extends javax.swing.JFrame {
             } catch (Exception ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
-        
+
 
     }//GEN-LAST:event_jButton_receiveFile_CActionPerformed
 
@@ -339,7 +345,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
     }//GEN-LAST:event_list_file_chungActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
+
         try {
             loadData(username);
         } catch (IOException ex) {
@@ -357,12 +363,12 @@ public class FTPclientFrom extends javax.swing.JFrame {
             f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         } catch (Exception e) {
         }
-        
+
 
     }//GEN-LAST:event_jButton_sua_thongtinActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        
+
         loginForm lgForm = new loginForm(socket);
         lgForm.setVisible(true);
         lgForm.pack();
@@ -410,15 +416,15 @@ public class FTPclientFrom extends javax.swing.JFrame {
                 }
             }
         });
-        
+
     }
-    
+
     public void sendFile() throws FileNotFoundException {
         String urlFile = jtext_file.getText();
         System.out.println(urlFile);
         File file = new File(urlFile);
         if (!file.exists()) {
-            
+
             JOptionPane.showMessageDialog(this, "File not Exists...");
         } else {
             try {
@@ -431,7 +437,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     if (jCheckBox_chung.isSelected()) {
                         dout.writeUTF("chung");
                         dout.flush();
-                        
+
                     } else {
                         dout.writeUTF(username);
                         dout.flush();
@@ -439,7 +445,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     message = din.readUTF();
                     System.out.println(message);
                     if (message.equals("UPdirchung")) {
-                        
+
                         dout.writeUTF(String.valueOf(file.length()));
                         dout.flush();
                         message = din.readUTF();
@@ -469,7 +475,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                     dout.writeUTF("khong_ghi_de");
                                     dout.flush();
                                 }
-                                
+
                             } else {
                                 FileInputStream fin = new FileInputStream(file);
                                 int ch;
@@ -480,12 +486,12 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                 fin.close();
                                 JOptionPane.showMessageDialog(this, "Send File success ");
                                 loadData(username);
-                                
+
                             }
-                            
+
                         }
                     } else if (message.equals("UPdir")) {
-                        
+
                         dout.writeUTF(String.valueOf(file.length()));
                         dout.flush();
                         message = din.readUTF();
@@ -516,7 +522,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                     dout.writeUTF("khong_ghi_de");
                                     dout.flush();
                                 }
-                                
+
                             } else {
                                 FileInputStream fin = new FileInputStream(file);
                                 int ch;
@@ -533,24 +539,24 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     } else {
                         JOptionPane.showMessageDialog(this, "Bạn đã bị block UP dir này ");
                     }
-                    
+
                 } else if (message.equals("blockUP")) {
                     JOptionPane.showMessageDialog(this, "Bạn đã bị block UP");
                 }
-                
+
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
-        
+
     }
-    
+
     public void receiveFile(String nameFile) {
         try {
-            
+
             dout.writeUTF("receive");
             dout.flush();
             dout.writeUTF(username);
@@ -565,11 +571,11 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     dout.flush();
                 }
                 message = din.readUTF();
-                
+
                 if (message.equals("DOWdir")) {
                     dout.writeUTF(nameFile);
                     dout.flush();
-                    
+
                     message = din.readUTF();
                     if (message.equals("File not Exists")) {
                         JOptionPane.showMessageDialog(this, "Server : file không tồn tại");
@@ -624,13 +630,13 @@ public class FTPclientFrom extends javax.swing.JFrame {
                             // System.out.println("Đã nhận");
                         } else {
                             JOptionPane.showMessageDialog(this, message);
-                            
+
                         }
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Bạn đã bị block DOWN dir này ");
                 }
-                
+
             } else if (message.equals("blockdown")) {
                 JOptionPane.showMessageDialog(this, "Bạn đã bị block Down");
             }
@@ -649,8 +655,8 @@ public class FTPclientFrom extends javax.swing.JFrame {
     private javax.swing.JCheckBox jCheckBox_chung;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel_dirUser;
     private javax.swing.JLabel jLabel_username;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
