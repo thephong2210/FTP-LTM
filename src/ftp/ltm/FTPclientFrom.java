@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class FTPclientFrom extends javax.swing.JFrame {
-
+    
     private static Socket socket = null;
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
@@ -40,23 +40,33 @@ public class FTPclientFrom extends javax.swing.JFrame {
         jLabel_username.setText(username);
         this.socket = socket;
         start(socket);
-
-        loadDir(username, list_file_user);
-        loadDir("chung", list_file_chung);
+        loadData(username);
+        
     }
-
+    
     public void start(Socket socket) {
         try {
             din = new DataInputStream(socket.getInputStream());
             dout = new DataOutputStream(socket.getOutputStream());
-
+            
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Chưa mở server");
         }
-
+        
         System.out.println(username);
     }
-
+    
+    public void loadData(String user) throws IOException {
+        if (!user.equals("anonymous")) {
+            loadDir(username, list_file_user);
+        } else {
+            jCheckBox_chung.setSelected(rootPaneCheckingEnabled);
+            jCheckBox_chung.show(false);
+            jButton_sua_thongtin.show(false);
+        }
+        loadDir("chung", list_file_chung);
+    }
+    
     private void loadDir(String username, java.awt.List list) throws IOException {
         list.clear();
         dout.writeUTF("reload");
@@ -287,7 +297,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
             } catch (Exception ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
         }
 
     }//GEN-LAST:event_btGuiActionPerformed
@@ -296,14 +306,14 @@ public class FTPclientFrom extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(jButton_Browse);
-
+        
         jtext_file.setText(chooser.getSelectedFile().getAbsolutePath());
 
     }//GEN-LAST:event_jButton_BrowseActionPerformed
 
     private void jButton_receiveFile_CActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_receiveFile_CActionPerformed
         String nameFile = jtext_file.getText();
-
+        
         if (nameFile.equals("")) {
             JOptionPane.showMessageDialog(this, "Chưa nhập tên file");
         } else {
@@ -312,9 +322,9 @@ public class FTPclientFrom extends javax.swing.JFrame {
             } catch (Exception ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
         }
-
+        
 
     }//GEN-LAST:event_jButton_receiveFile_CActionPerformed
 
@@ -329,10 +339,9 @@ public class FTPclientFrom extends javax.swing.JFrame {
     }//GEN-LAST:event_list_file_chungActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        
         try {
-            loadDir(username, list_file_user);
-            loadDir("chung", list_file_chung);
+            loadData(username);
         } catch (IOException ex) {
             Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -348,15 +357,17 @@ public class FTPclientFrom extends javax.swing.JFrame {
             f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         } catch (Exception e) {
         }
-
+        
 
     }//GEN-LAST:event_jButton_sua_thongtinActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-       Socket s = new Socket();
-       loginForm lgForm = new loginForm(s);
-       this.setVisible(false);
-       lgForm.setVisible(true);
+        
+        loginForm lgForm = new loginForm(socket);
+        lgForm.setVisible(true);
+        lgForm.pack();
+        lgForm.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -399,15 +410,15 @@ public class FTPclientFrom extends javax.swing.JFrame {
                 }
             }
         });
-
+        
     }
-
+    
     public void sendFile() throws FileNotFoundException {
         String urlFile = jtext_file.getText();
         System.out.println(urlFile);
         File file = new File(urlFile);
         if (!file.exists()) {
-
+            
             JOptionPane.showMessageDialog(this, "File not Exists...");
         } else {
             try {
@@ -420,7 +431,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     if (jCheckBox_chung.isSelected()) {
                         dout.writeUTF("chung");
                         dout.flush();
-
+                        
                     } else {
                         dout.writeUTF(username);
                         dout.flush();
@@ -428,7 +439,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     message = din.readUTF();
                     System.out.println(message);
                     if (message.equals("UPdirchung")) {
-
+                        
                         dout.writeUTF(String.valueOf(file.length()));
                         dout.flush();
                         message = din.readUTF();
@@ -453,13 +464,12 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                     } while (ch != -1);
                                     fin.close();
                                     JOptionPane.showMessageDialog(this, "Send File success ");
-                                    loadDir(username, list_file_user);
-                                    loadDir("chung", list_file_chung);
+                                    loadData(username);
                                 } else {
                                     dout.writeUTF("khong_ghi_de");
                                     dout.flush();
                                 }
-
+                                
                             } else {
                                 FileInputStream fin = new FileInputStream(file);
                                 int ch;
@@ -469,13 +479,13 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                 } while (ch != -1);
                                 fin.close();
                                 JOptionPane.showMessageDialog(this, "Send File success ");
-                                loadDir(username, list_file_user);
-                                loadDir("chung", list_file_chung);
+                                loadData(username);
+                                
                             }
-
+                            
                         }
                     } else if (message.equals("UPdir")) {
-
+                        
                         dout.writeUTF(String.valueOf(file.length()));
                         dout.flush();
                         message = din.readUTF();
@@ -506,7 +516,7 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                     dout.writeUTF("khong_ghi_de");
                                     dout.flush();
                                 }
-
+                                
                             } else {
                                 FileInputStream fin = new FileInputStream(file);
                                 int ch;
@@ -523,24 +533,24 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     } else {
                         JOptionPane.showMessageDialog(this, "Bạn đã bị block UP dir này ");
                     }
-
+                    
                 } else if (message.equals("blockUP")) {
                     JOptionPane.showMessageDialog(this, "Bạn đã bị block UP");
                 }
-
+                
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
         }
-
+        
     }
-
+    
     public void receiveFile(String nameFile) {
         try {
-
+            
             dout.writeUTF("receive");
             dout.flush();
             dout.writeUTF(username);
@@ -555,10 +565,11 @@ public class FTPclientFrom extends javax.swing.JFrame {
                     dout.flush();
                 }
                 message = din.readUTF();
+                
                 if (message.equals("DOWdir")) {
                     dout.writeUTF(nameFile);
                     dout.flush();
-
+                    
                     message = din.readUTF();
                     if (message.equals("File not Exists")) {
                         JOptionPane.showMessageDialog(this, "Server : file không tồn tại");
@@ -570,28 +581,56 @@ public class FTPclientFrom extends javax.swing.JFrame {
                                 System.out.println("Create directory " + dir.getAbsolutePath() + " success.");
                             }
                             File f = new File("D://FTP_receive//" + nameFile);
-                            FileOutputStream fout = new FileOutputStream(f);
-                            int ch;
-                            String temp;
-                            do {
-                                temp = din.readUTF();
-                                ch = Integer.parseInt(temp);
-                                if (ch != -1) {
-                                    fout.write(ch);
+                            if (f.exists()) {
+                                int n = JOptionPane.showConfirmDialog(this, "File đã tồn tại, bạn có muốn ghi đè ?",
+                                        "Alert",
+                                        JOptionPane.YES_NO_OPTION);
+                                if (n == JOptionPane.YES_OPTION) {
+                                    dout.writeUTF("ok");
+                                    dout.flush();
+                                    FileOutputStream fout = new FileOutputStream(f);
+                                    int ch;
+                                    String temp;
+                                    do {
+                                        temp = din.readUTF();
+                                        ch = Integer.parseInt(temp);
+                                        if (ch != -1) {
+                                            fout.write(ch);
+                                        }
+                                    } while (ch != -1);
+                                    fout.close();
+                                    JOptionPane.showMessageDialog(this, "Nhận file thành công\n File tải về nằm ở\n\tD:/FTP_receive");
+                                } else {
+                                    dout.writeUTF("no_ok");
+                                    dout.flush();
                                 }
-                            } while (ch != -1);
-                            fout.close();
-                            JOptionPane.showMessageDialog(this, "Nhận file thành công\n File tải về nằm ở\n\tD:/FTP_receive");
+                            } else {
+                                dout.writeUTF("ok");
+                                dout.flush();
+                                FileOutputStream fout = new FileOutputStream(f);
+                                int ch;
+                                String temp;
+                                do {
+                                    temp = din.readUTF();
+                                    ch = Integer.parseInt(temp);
+                                    if (ch != -1) {
+                                        fout.write(ch);
+                                    }
+                                } while (ch != -1);
+                                fout.close();
+                                JOptionPane.showMessageDialog(this, "Nhận file thành công\n File tải về nằm ở\n\tD:/FTP_receive");
+                            }
+
                             // System.out.println("Đã nhận");
                         } else {
-                            JOptionPane.showMessageDialog(this, "file lớn hơn giới hạn không thể tải về ");
-
+                            JOptionPane.showMessageDialog(this, message);
+                            
                         }
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Bạn đã bị block DOWN dir này ");
                 }
-
+                
             } else if (message.equals("blockdown")) {
                 JOptionPane.showMessageDialog(this, "Bạn đã bị block Down");
             }

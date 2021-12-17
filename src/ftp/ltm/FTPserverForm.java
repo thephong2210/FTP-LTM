@@ -286,56 +286,59 @@ public class FTPserverForm extends javax.swing.JFrame {
     }
     private void jButton_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_okActionPerformed
         int row = jTable_user.getSelectedRow();
-        TableModel model = jTable_user.getModel();
-        String username = model.getValueAt(row, 0).toString();
-        String quyen = username;
-        if (jCheckBox_block_up.isSelected()) {
-            quyen += ";no;";
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 dòng trên bảng để cấu hình");
+
         } else {
-            quyen += ";yes;";
-        }
-        if (jCheckBox_block_down.isSelected()) {
-            quyen += "no;";
-        } else {
-            quyen += "yes;";
-        }
-        if (jCheckBox_blockDirUser.isSelected()) {
-            quyen += "no;";
-        } else {
-            quyen += "yes;";
-        }
-        if (jCheckBox_blockDirChung.isSelected()) {
-            quyen += "no";
-        } else {
-            quyen += "yes";
-        }
-        if (check()) {
-            String dungluong = jTextField_dungluong.getText();
-            String max_up = jTextField_maxUP.getText();
-            String max_down = jTextField_maxDOWN.getText();
-            quyen += ";" + dungluong + ";" + max_up + ";" + max_down;
-            mapQuyenUser.put(username, quyen);
-            try {
-                FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\quyen_user.txt");
-                Set<String> keySet = mapQuyenUser.keySet();
-                for (String key : keySet) {
-                    fw.write(mapQuyenUser.get(key) + "\n");
+            TableModel model = jTable_user.getModel();
+            String username = model.getValueAt(row, 0).toString();
+            String quyen = username;
+            if (jCheckBox_block_up.isSelected()) {
+                quyen += ";no;";
+            } else {
+                quyen += ";yes;";
+            }
+            if (jCheckBox_block_down.isSelected()) {
+                quyen += "no;";
+            } else {
+                quyen += "yes;";
+            }
+            if (jCheckBox_blockDirUser.isSelected()) {
+                quyen += "no;";
+            } else {
+                quyen += "yes;";
+            }
+            if (jCheckBox_blockDirChung.isSelected()) {
+                quyen += "no";
+            } else {
+                quyen += "yes";
+            }
+            if (check()) {
+                String dungluong = jTextField_dungluong.getText();
+                String max_up = jTextField_maxUP.getText();
+                String max_down = jTextField_maxDOWN.getText();
+                quyen += ";" + dungluong + ";" + max_up + ";" + max_down;
+                mapQuyenUser.put(username, quyen);
+                try {
+                    FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\quyen_user.txt");
+                    Set<String> keySet = mapQuyenUser.keySet();
+                    for (String key : keySet) {
+                        fw.write(mapQuyenUser.get(key) + "\n");
+                    }
+                    fw.close();
+
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
-                fw.close();
-
-            } catch (Exception e) {
-                System.out.println(e);
+                try {
+                    loadTableUser();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(FTPserverForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Chỉ được nhập số lớn hơn 0");
             }
-            try {
-                loadTableUser();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(FTPserverForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Chỉ được nhập số");
         }
-
-
     }//GEN-LAST:event_jButton_okActionPerformed
 
     private void jButton_lammoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_lammoiActionPerformed
@@ -439,16 +442,15 @@ public class FTPserverForm extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
+
         //</editor-fold>
         //</editor-fold>
-        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     new FTPserverForm().setVisible(true);
-                   
+
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(FTPserverForm.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -760,19 +762,25 @@ class transferfile extends Thread {
                 System.out.println("sizeFile " + sizeFile);
                 System.out.println("MaxDown " + MaxDown);
                 if (sizeFile > MaxDown) {
-                    dout.writeUTF("File lớn hơn giới hạn");
+                    dout.writeUTF("File lớn hơn giới hạn\nKích thước file tối đa tải về của bạn là :" + MaxDown + "\nsizeFile của bạn là:" + sizeFile);
                     dout.flush();
                 } else {
                     dout.writeUTF("ok");
                     dout.flush();
-                    FileInputStream fin = new FileInputStream(file);
-                    int ch;
-                    do {
-                        ch = fin.read();
-                        dout.writeUTF(String.valueOf(ch));
-                    } while (ch != -1);
-                    fin.close();
-                    System.out.println("server đã gửi file");
+                    String ms = din.readUTF();
+                    if (ms.equals("ok")) {
+                        FileInputStream fin = new FileInputStream(file);
+                        int ch;
+                        do {
+                            ch = fin.read();
+                            dout.writeUTF(String.valueOf(ch));
+                        } while (ch != -1);
+                        fin.close();
+                        System.out.println("server đã gửi file");
+                    }else{
+                        System.out.println("client ko tải nữa");
+                    }
+
                 }
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(FTPclientFrom.class.getName()).log(Level.SEVERE, null, ex);
@@ -869,55 +877,71 @@ class transferfile extends Thread {
     }
 
     public boolean checkUP(String username) throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(username);
-        StringTokenizer st = new StringTokenizer(quyen, ";");
-        st.nextToken();
-        String up = st.nextToken();
-        if (up.equals("yes")) {
+        if (username.equals("anonymous")) {
             return true;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            String up = st.nextToken();
+            if (up.equals("yes")) {
+                return true;
+            }
         }
         return false;
     }
 
     public boolean checkDOWN(String username) throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(username);
-        StringTokenizer st = new StringTokenizer(quyen, ";");
-        st.nextToken();
-        st.nextToken();
-        String down = st.nextToken();
-        if (down.equals("yes")) {
+        if (username.equals("anonymous")) {
             return true;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            st.nextToken();
+            String down = st.nextToken();
+            if (down.equals("yes")) {
+                return true;
+            }
         }
         return false;
     }
 
     public boolean checkDirUser(String username) throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(username);
-        StringTokenizer st = new StringTokenizer(quyen, ";");
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        String dirUser = st.nextToken();
-        if (dirUser.equals("yes")) {
+        if (username.equals("anonymous")) {
             return true;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            String dirUser = st.nextToken();
+            if (dirUser.equals("yes")) {
+                return true;
+            }
         }
         return false;
     }
 
     public boolean checkDirChung(String username) throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(username);
-        StringTokenizer st = new StringTokenizer(quyen, ";");
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        String dirChung = st.nextToken();
-        if (dirChung.equals("yes")) {
+        if (username.equals("anonymous")) {
             return true;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            String dirChung = st.nextToken();
+            if (dirChung.equals("yes")) {
+                return true;
+            }
         }
         return false;
     }
@@ -944,36 +968,44 @@ class transferfile extends Thread {
     }
 
     public int checkMaxUP(String username) throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(username);
-        StringTokenizer st = new StringTokenizer(quyen, ";");
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        int maxUP = Integer.valueOf(st.nextToken());
-        System.out.println("max up: " + maxUP);
+        if (username.equals("anonymous")) {
+            return 50;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            int maxUP = Integer.valueOf(st.nextToken());
+            System.out.println("max up: " + maxUP);
 
-        return maxUP;
+            return maxUP;
+        }
     }
 
     public int checkMaxDown(String username) throws FileNotFoundException {
-        loadHashMap();
-        String quyen = mapQuyenUser.get(username);
-        StringTokenizer st = new StringTokenizer(quyen, ";");
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        st.nextToken();
-        int maxDOWN = Integer.valueOf(st.nextToken());
-        System.out.println("max down: " + maxDOWN);
+        if (username.equals("anonymous")) {
+            return 50;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            int maxDOWN = Integer.valueOf(st.nextToken());
+            System.out.println("max down: " + maxDOWN);
 
-        return maxDOWN;
+            return maxDOWN;
+        }
     }
 
     private static long getFolderSize(File folder) {
@@ -1039,7 +1071,7 @@ class transferfile extends Thread {
                     } else {
                         dout.writeUTF("not_exists");
                         dout.flush();
-                        
+
                     }
                 }
                 if (line.equals("get_info")) {
@@ -1078,11 +1110,11 @@ class transferfile extends Thread {
                                 dout.flush();
                                 long sizeFile = Long.parseLong(din.readUTF());
                                 if (sizeFile > checkDungLuongTrong(user)) { // kiểm tra dung lượng còn chống
-                                    dout.writeUTF("không đủ dung lượng");
+                                    dout.writeUTF("không đủ dung lượng\nDung lượng trống còn lại của bạn là :" + checkDungLuongTrong(user) + "\nKích thước file của bạn là:" + sizeFile);
                                     dout.flush();
                                 } else {
                                     if (sizeFile > checkMaxUP(user)) {
-                                        dout.writeUTF("file quá lớn");
+                                        dout.writeUTF("file quá lớn\n Kích thước file tối đa tải lên của bạn là:" + checkMaxUP(user) + "\nKích thước file của bạn là:" + sizeFile);
                                         dout.flush();
                                     } else {
                                         dout.writeUTF("ok");
@@ -1103,7 +1135,7 @@ class transferfile extends Thread {
                                 dout.flush();
                                 long sizeFile = Long.parseLong(din.readUTF());
                                 if (sizeFile > checkMaxUP(user)) {
-                                    dout.writeUTF("file quá lớn");
+                                    dout.writeUTF("file quá lớn\n Kích thước file tối đa tải lên của bạn là:" + checkMaxUP(user) + "\nKích thước file của bạn là:" + sizeFile);
                                     dout.flush();
                                 } else {
                                     dout.writeUTF("ok");

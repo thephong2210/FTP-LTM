@@ -258,10 +258,6 @@ public class registerForm extends javax.swing.JFrame {
         if (jTextField_username.getText().equals("")) {
             ms += "Email chưa điền \n";
         } else {
-//            String regex = "^[a-zA-z][a-zA-Z0-9]+@gmail+(\\.com+)$";
-//            Pattern pattern = Pattern.compile(regex);
-//            Matcher matcher = pattern.matcher(jTextField_username.getText());
-//            
             if (!EmailValidator.getInstance().isValid(jTextField_username.getText())) {
                 ms += "Email không hợp lệ \n";
             } else {
@@ -283,12 +279,12 @@ public class registerForm extends javax.swing.JFrame {
         if (jTextField_pass.getText().equals("")) {
             ms += "Pass chưa điền \n";
         } else {
-         String regex1 = "^(?=\\S+$).{8,}$";
-         Pattern pattern1 = Pattern.compile(regex1);
- 	    Matcher matcher1 = pattern1.matcher(jTextField_pass.getText());
-     	if(!matcher1.matches()) {
-     		ms += "Pass không chứa khoản trắng và ít nhất 8 kí tự \n";
-     	}
+            String regex1 = "^(?=\\S+$).{8,}$";
+            Pattern pattern1 = Pattern.compile(regex1);
+            Matcher matcher1 = pattern1.matcher(jTextField_pass.getText());
+            if (!matcher1.matches()) {
+                ms += "Pass không chứa khoản trắng và ít nhất 8 kí tự \n";
+            }
         }
 
         if (jTextField_hoten.getText().equals("")) {

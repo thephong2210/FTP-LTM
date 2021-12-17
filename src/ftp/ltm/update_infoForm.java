@@ -31,6 +31,7 @@ public class update_infoForm extends javax.swing.JFrame {
     private static DataInputStream din = null;
     private static DataOutputStream dout = null;
     private static String username = null;
+    private static String pass = null;
 
     /**
      * Creates new form update_infoForm
@@ -64,7 +65,7 @@ public class update_infoForm extends javax.swing.JFrame {
         String info_user = din.readUTF();
         StringTokenizer st = new StringTokenizer(info_user, ";");
         st.nextToken(); // bỏ qua user name vì mình đã có rồi
-        st.nextToken(); // bỏ qua pass vì nó đã hash
+        pass = st.nextToken();
         String hoten = st.nextToken();
         String gioitinh = st.nextToken();
         String ngaysinh = st.nextToken();
@@ -246,8 +247,16 @@ public class update_infoForm extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String ms = "";
 
-        if (jTextField_pass.getText().equals("")) {
-            ms += "Pass chưa điền \n";
+        if (!jTextField_pass.getText().equals("")) {
+            String regex1 = "^(?=\\S+$).{8,}$";
+            Pattern pattern1 = Pattern.compile(regex1);
+            Matcher matcher1 = pattern1.matcher(jTextField_pass.getText());
+            if (!matcher1.matches()) {
+                ms += "Pass không chứa khoản trắng và ít nhất 8 kí tự \n";
+            } else {
+                pass = jTextField_pass.getText();
+
+            }
         }
 
         if (jTextField_hoten.getText().equals("")) {
@@ -274,9 +283,8 @@ public class update_infoForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ms);
         } else {
 
-            String username, pass, hoten, gioitinh, ngaysinh;
+            String username, hoten, gioitinh, ngaysinh;
             username = jLabel_username.getText();
-            pass = jTextField_pass.getText();
             hoten = jTextField_hoten.getText();
             if (jRadioButton_nam.isSelected()) {
                 gioitinh = jRadioButton_nam.getText();
