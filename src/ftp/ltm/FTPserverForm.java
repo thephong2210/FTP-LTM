@@ -83,6 +83,7 @@ public class FTPserverForm extends javax.swing.JFrame {
         jTextField_maxUP = new javax.swing.JTextField();
         jTextField_maxDOWN = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
+        jlabel_uername = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("FTP - Server");
@@ -183,23 +184,31 @@ public class FTPserverForm extends javax.swing.JFrame {
 
         jTextField_maxDOWN.setText(" ");
 
+        jlabel_uername.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jlabel_uername.setText("username");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(127, 127, 127)
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox_blockDirChung)
-                    .addComponent(jCheckBox_block_up)
-                    .addComponent(jCheckBox_block_down)
-                    .addComponent(jCheckBox_blockDirUser))
-                .addGap(77, 77, 77)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBox_block_up)
+                            .addComponent(jCheckBox_block_down))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBox_blockDirChung)
+                            .addComponent(jCheckBox_blockDirUser)))
+                    .addComponent(jlabel_uername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addGap(28, 28, 28)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(1, 1, 1)
@@ -208,7 +217,7 @@ public class FTPserverForm extends javax.swing.JFrame {
                             .addComponent(jTextField_maxDOWN)))
                     .addComponent(jTextField_dungluong, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton_ok, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
+                .addGap(110, 110, 110)
                 .addComponent(jButton_lammoi, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(41, 41, 41))
             .addGroup(layout.createSequentialGroup()
@@ -230,11 +239,6 @@ public class FTPserverForm extends javax.swing.JFrame {
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField_dungluong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
@@ -246,13 +250,22 @@ public class FTPserverForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton_ok))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jCheckBox_block_up, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
+                        .addComponent(jlabel_uername)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox_block_down)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox_blockDirUser)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox_blockDirChung)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jCheckBox_blockDirUser)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox_blockDirChung))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel4))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jCheckBox_block_up, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox_block_down)))))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
 
@@ -285,13 +298,11 @@ public class FTPserverForm extends javax.swing.JFrame {
         return true;
     }
     private void jButton_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_okActionPerformed
-        int row = jTable_user.getSelectedRow();
-        if (row < 0) {
+        String username = jlabel_uername.getText();
+        if (username.equals("username")) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 dòng trên bảng để cấu hình");
-
         } else {
-            TableModel model = jTable_user.getModel();
-            String username = model.getValueAt(row, 0).toString();
+
             String quyen = username;
             if (jCheckBox_block_up.isSelected()) {
                 quyen += ";no;";
@@ -365,6 +376,7 @@ public class FTPserverForm extends javax.swing.JFrame {
     private void jTable_userMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable_userMouseClicked
         int row = jTable_user.getSelectedRow();
         TableModel model = jTable_user.getModel();
+        jlabel_uername.setText(model.getValueAt(row, 0).toString());
         String up = model.getValueAt(row, 1).toString();
         String down = model.getValueAt(row, 2).toString();
         String Dir_user = model.getValueAt(row, 3).toString();
@@ -577,6 +589,7 @@ public class FTPserverForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField_dungluong;
     private javax.swing.JTextField jTextField_maxDOWN;
     private javax.swing.JTextField jTextField_maxUP;
+    private javax.swing.JLabel jlabel_uername;
     // End of variables declaration//GEN-END:variables
 
 }
@@ -771,7 +784,7 @@ class transferfile extends Thread {
                 System.out.println("sizeFile " + sizeFile);
                 System.out.println("MaxDown " + MaxDown);
                 if (sizeFile > MaxDown) {
-                    dout.writeUTF("File lớn hơn giới hạn\nKích thước file tối đa tải về của bạn là :" + MaxDown + "\nsizeFile của bạn là:" + sizeFile);
+                    dout.writeUTF("File lớn hơn giới hạn\nKích thước file tối đa tải về của bạn là :" + MaxDown + " byte\nsizeFile của bạn là:" + sizeFile + " byte");
                     dout.flush();
                 } else {
                     dout.writeUTF("ok");
@@ -971,6 +984,10 @@ class transferfile extends Thread {
         int dungluongUsed = (int) getFolderSize(dir);
         System.out.println("dung lượng đã sử dụng: " + dungluongUsed);
         int dungluong_conlai = dungluong - dungluongUsed;
+
+        if (dungluong_conlai < 0) {
+            dungluong_conlai = 0;
+        }
         System.out.println("dung lượng còn lại: " + dungluong_conlai);
 
         return dungluong_conlai;
@@ -1119,11 +1136,11 @@ class transferfile extends Thread {
                                 dout.flush();
                                 long sizeFile = Long.parseLong(din.readUTF());
                                 if (sizeFile > checkDungLuongTrong(user)) { // kiểm tra dung lượng còn chống
-                                    dout.writeUTF("không đủ dung lượng\nDung lượng trống còn lại của bạn là :" + checkDungLuongTrong(user) + "\nKích thước file của bạn là:" + sizeFile);
+                                    dout.writeUTF("không đủ dung lượng\nDung lượng trống còn lại của bạn là :" + checkDungLuongTrong(user) + " byte\nKích thước file của bạn là:" + sizeFile + " byte");
                                     dout.flush();
                                 } else {
                                     if (sizeFile > checkMaxUP(user)) {
-                                        dout.writeUTF("file quá lớn\n Kích thước file tối đa tải lên của bạn là:" + checkMaxUP(user) + "\nKích thước file của bạn là:" + sizeFile);
+                                        dout.writeUTF("file quá lớn\n Kích thước file tối đa tải lên của bạn là:" + checkMaxUP(user) + " byte\nKích thước file của bạn là:" + sizeFile + " byte");
                                         dout.flush();
                                     } else {
                                         dout.writeUTF("ok");
@@ -1144,7 +1161,7 @@ class transferfile extends Thread {
                                 dout.flush();
                                 long sizeFile = Long.parseLong(din.readUTF());
                                 if (sizeFile > checkMaxUP(user)) {
-                                    dout.writeUTF("file quá lớn\n Kích thước file tối đa tải lên của bạn là:" + checkMaxUP(user) + "\nKích thước file của bạn là:" + sizeFile);
+                                    dout.writeUTF("file quá lớn\n Kích thước file tối đa tải lên của bạn là:" + checkMaxUP(user) + " byte\nKích thước file của bạn là:" + sizeFile + " byte");
                                     dout.flush();
                                 } else {
                                     dout.writeUTF("ok");
