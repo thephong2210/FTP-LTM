@@ -82,8 +82,10 @@ public class FTPserverForm extends javax.swing.JFrame {
         jTextField_dungluong = new javax.swing.JTextField();
         jTextField_maxUP = new javax.swing.JTextField();
         jTextField_maxDOWN = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("FTP - Server");
         setLocation(new java.awt.Point(0, 0));
 
         jLabel1.setFont(new java.awt.Font("Arial", 3, 48)); // NOI18N
@@ -94,9 +96,17 @@ public class FTPserverForm extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Username ", "UPload ", "Download", "Dir user", "Dir chung", "Dung lượng", "MAX_upload", "MAX_download"
+                "Username ", "Upload", "Download", "Thư mục user", "Thư mục chung", "Dung lượng (B)", "Tối đa upload", "Tối đa download"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jTable_user.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTable_user.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -104,12 +114,6 @@ public class FTPserverForm extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(jTable_user);
-        if (jTable_user.getColumnModel().getColumnCount() > 0) {
-            jTable_user.getColumnModel().getColumn(1).setMaxWidth(60);
-            jTable_user.getColumnModel().getColumn(2).setMaxWidth(100);
-            jTable_user.getColumnModel().getColumn(3).setMaxWidth(65);
-            jTable_user.getColumnModel().getColumn(4).setMaxWidth(80);
-        }
 
         jButton_ok.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
         jButton_ok.setText("OK");
@@ -120,7 +124,7 @@ public class FTPserverForm extends javax.swing.JFrame {
         });
 
         jCheckBox_block_up.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jCheckBox_block_up.setText("block UP");
+        jCheckBox_block_up.setText("block Upload");
         jCheckBox_block_up.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBox_block_upActionPerformed(evt);
@@ -128,7 +132,12 @@ public class FTPserverForm extends javax.swing.JFrame {
         });
 
         jCheckBox_block_down.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jCheckBox_block_down.setText("block DOWN");
+        jCheckBox_block_down.setText("block Download");
+        jCheckBox_block_down.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox_block_downActionPerformed(evt);
+            }
+        });
 
         jButton_lammoi.setFont(new java.awt.Font("Tahoma", 3, 16)); // NOI18N
         jButton_lammoi.setText("Làm mới");
@@ -139,10 +148,15 @@ public class FTPserverForm extends javax.swing.JFrame {
         });
 
         jCheckBox_blockDirUser.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jCheckBox_blockDirUser.setText("block Dir User");
+        jCheckBox_blockDirUser.setText("block thư mục user");
+        jCheckBox_blockDirUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox_blockDirUserActionPerformed(evt);
+            }
+        });
 
         jCheckBox_blockDirChung.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jCheckBox_blockDirChung.setText("block Dir Chung");
+        jCheckBox_blockDirChung.setText("block thư mục chung");
         jCheckBox_blockDirChung.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBox_blockDirChungActionPerformed(evt);
@@ -150,13 +164,13 @@ public class FTPserverForm extends javax.swing.JFrame {
         });
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jLabel2.setText("Dung Lương");
+        jLabel2.setText("Dung lượng");
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jLabel3.setText("MAX_UP");
+        jLabel3.setText("Tối đa upload");
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
-        jLabel4.setText("MAX_DOWN");
+        jLabel4.setText("Tối đa download");
 
         jTextField_dungluong.setText(" ");
         jTextField_dungluong.addActionListener(new java.awt.event.ActionListener() {
@@ -174,70 +188,72 @@ public class FTPserverForm extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(127, 127, 127)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jCheckBox_blockDirChung)
+                    .addComponent(jCheckBox_block_up)
+                    .addComponent(jCheckBox_block_down)
+                    .addComponent(jCheckBox_blockDirUser))
+                .addGap(77, 77, 77)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
+                        .addGap(1, 1, 1)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jCheckBox_blockDirChung)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 442, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBox_block_up)
-                                    .addComponent(jCheckBox_block_down)
-                                    .addComponent(jCheckBox_blockDirUser))
-                                .addGap(61, 61, 61)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
-                                .addGap(28, 28, 28)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(1, 1, 1)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jTextField_maxUP)
-                                            .addComponent(jTextField_maxDOWN)))
-                                    .addComponent(jTextField_dungluong, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton_ok, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton_lammoi))))
-                    .addComponent(jScrollPane1))
-                .addContainerGap())
+                            .addComponent(jTextField_maxUP)
+                            .addComponent(jTextField_maxDOWN)))
+                    .addComponent(jTextField_dungluong, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton_ok, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
+                .addComponent(jButton_lammoi, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(41, 41, 41))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1)
+            .addComponent(jSeparator1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(14, 14, 14)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jCheckBox_block_up)
+                        .addGap(34, 34, 34)
+                        .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCheckBox_block_down)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCheckBox_blockDirUser)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox_blockDirChung))
+                        .addComponent(jLabel4))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField_dungluong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
-                            .addComponent(jButton_lammoi))
+                            .addComponent(jButton_lammoi, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField_maxUP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField_maxDOWN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton_ok))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jCheckBox_block_up, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton_ok)))
-                .addContainerGap())
+                        .addComponent(jCheckBox_block_down)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox_blockDirUser)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox_blockDirChung)))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         pack();
@@ -380,6 +396,14 @@ public class FTPserverForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jTable_userMouseClicked
 
+    private void jCheckBox_block_downActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox_block_downActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox_block_downActionPerformed
+
+    private void jCheckBox_blockDirUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox_blockDirUserActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox_blockDirUserActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -415,18 +439,20 @@ public class FTPserverForm extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
+        
+        //</editor-fold>
+        //</editor-fold>
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     new FTPserverForm().setVisible(true);
-
+                   
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(FTPserverForm.class
                             .getName()).log(Level.SEVERE, null, ex);
                 }
-
             }
         });
         FTPserverForm server = new FTPserverForm();
@@ -544,6 +570,7 @@ public class FTPserverForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable_user;
     private javax.swing.JTextField jTextField_dungluong;
     private javax.swing.JTextField jTextField_maxDOWN;
