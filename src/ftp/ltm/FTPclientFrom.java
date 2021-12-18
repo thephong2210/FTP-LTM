@@ -312,8 +312,13 @@ public class FTPclientFrom extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser chooser = new JFileChooser();
         chooser.showOpenDialog(jButton_Browse);
-
-        jtext_file.setText(chooser.getSelectedFile().getAbsolutePath());
+        
+        if(chooser.getSelectedFile()!=null){
+            jtext_file.setText(chooser.getSelectedFile().getAbsolutePath());
+        }else{
+            System.out.println("Đã tắt cửa sổ duyệt file");
+        }
+        
 
     }//GEN-LAST:event_jButton_BrowseActionPerformed
 
