@@ -7,6 +7,7 @@ package ftp.ltm;
 
 import static ftp.ltm.FTPserverForm.loadHashMap;
 import static ftp.ltm.FTPserverForm.mapInfoUser;
+import static ftp.ltm.FTPserverForm.mapLogDirChung;
 import static ftp.ltm.FTPserverForm.mapQuyenUser;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -49,6 +50,7 @@ public class FTPserverForm extends javax.swing.JFrame {
 
     public static LinkedHashMap<String, String> mapQuyenUser = null;
     public static LinkedHashMap<String, String> mapInfoUser = null;
+    public static LinkedHashMap<String, String> mapLogDirChung = null;
 
     public FTPserverForm() throws FileNotFoundException {
         initComponents();
@@ -84,6 +86,7 @@ public class FTPserverForm extends javax.swing.JFrame {
         jTextField_maxDOWN = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         jlabel_uername = new javax.swing.JLabel();
+        jCheckBox_anonymous = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("FTP - Server");
@@ -97,11 +100,11 @@ public class FTPserverForm extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Username ", "Upload", "Download", "Thư mục user", "Thư mục chung", "Dung lượng (B)", "Tối đa upload", "Tối đa download"
+                "Username ", "Upload", "Download", "Thư mục user", "Thư mục chung", "Dung lượng (B)", "Tối đa upload", "Tối đa download", "anonymous"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -187,6 +190,14 @@ public class FTPserverForm extends javax.swing.JFrame {
         jlabel_uername.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jlabel_uername.setText("username");
 
+        jCheckBox_anonymous.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jCheckBox_anonymous.setText("block anonymous");
+        jCheckBox_anonymous.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox_anonymousActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -202,8 +213,11 @@ public class FTPserverForm extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCheckBox_blockDirChung)
                             .addComponent(jCheckBox_blockDirUser)))
-                    .addComponent(jlabel_uername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jlabel_uername, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jCheckBox_anonymous)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -250,8 +264,10 @@ public class FTPserverForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton_ok))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
-                        .addComponent(jlabel_uername)
+                        .addGap(2, 2, 2)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jlabel_uername)
+                            .addComponent(jCheckBox_anonymous))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
@@ -329,6 +345,11 @@ public class FTPserverForm extends javax.swing.JFrame {
                 String max_up = jTextField_maxUP.getText();
                 String max_down = jTextField_maxDOWN.getText();
                 quyen += ";" + dungluong + ";" + max_up + ";" + max_down;
+                if (jCheckBox_anonymous.isSelected()) {
+                    quyen += ";no";
+                } else {
+                    quyen += ";yes";
+                }
                 mapQuyenUser.put(username, quyen);
                 try {
                     FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\quyen_user.txt");
@@ -384,6 +405,7 @@ public class FTPserverForm extends javax.swing.JFrame {
         String dungluong = model.getValueAt(row, 5).toString();
         String max_up = model.getValueAt(row, 6).toString();
         String max_down = model.getValueAt(row, 7).toString();
+        String anonymous = model.getValueAt(row, 8).toString();
         if (up.equals("no")) {
             jCheckBox_block_up.setSelected(true);
         } else {
@@ -404,6 +426,11 @@ public class FTPserverForm extends javax.swing.JFrame {
         } else {
             jCheckBox_blockDirChung.setSelected(false);
         }
+        if (anonymous.equals("no")) {
+            jCheckBox_anonymous.setSelected(true);
+        } else {
+            jCheckBox_anonymous.setSelected(false);
+        }
         jTextField_dungluong.setText(dungluong);
         jTextField_maxUP.setText(max_up);
         jTextField_maxDOWN.setText(max_down);
@@ -418,6 +445,10 @@ public class FTPserverForm extends javax.swing.JFrame {
     private void jCheckBox_blockDirUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox_blockDirUserActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jCheckBox_blockDirUserActionPerformed
+
+    private void jCheckBox_anonymousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox_anonymousActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox_anonymousActionPerformed
 
     /**
      * @param args the command line arguments
@@ -501,8 +532,9 @@ public class FTPserverForm extends javax.swing.JFrame {
             String dungluong = st.nextToken();
             String max_up = st.nextToken();
             String max_down = st.nextToken();
+            String anonymous = st.nextToken();
             tableUser.addRow(new Object[]{
-                username, up, down, Dir_user, Dir_chung, dungluong, max_up, max_down
+                username, up, down, Dir_user, Dir_chung, dungluong, max_up, max_down, anonymous
             });
         }
 
@@ -528,7 +560,8 @@ public class FTPserverForm extends javax.swing.JFrame {
                 String dungluong = st.nextToken();
                 String max_up = st.nextToken();
                 String max_down = st.nextToken();
-                mapQuyenUser.put(username, username + ";" + up + ";" + down + ";" + Dir_user + ";" + Dir_chung + ";" + dungluong + ";" + max_up + ";" + max_down);
+                String anonymous = st.nextToken();
+                mapQuyenUser.put(username, username + ";" + up + ";" + down + ";" + Dir_user + ";" + Dir_chung + ";" + dungluong + ";" + max_up + ";" + max_down + ";" + anonymous);
             }
 
         } finally {
@@ -568,6 +601,31 @@ public class FTPserverForm extends javax.swing.JFrame {
 
             }
         }
+        // load file logdir vào map
+        mapLogDirChung = new LinkedHashMap<String, String>();
+        url = ".\\src\\ftp\\ltm\\logDirChung.txt";
+        // Đọc dữ liệu từ File với Scanner
+        fileInputStream = new FileInputStream(url);
+        scanner = new Scanner(fileInputStream);
+        st = null;
+
+        try {
+            while (scanner.hasNextLine()) {
+                st = new StringTokenizer(scanner.nextLine(), ";");
+                String nameFile = st.nextToken();
+                String sizeFile = st.nextToken();
+                String sender = st.nextToken();
+                mapLogDirChung.put(nameFile, nameFile + ";" + sizeFile + ";" + sender);
+            }
+
+        } finally {
+            try {
+                scanner.close();
+                fileInputStream.close();
+            } catch (IOException ex) {
+
+            }
+        }
 
     }
 
@@ -575,6 +633,7 @@ public class FTPserverForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_lammoi;
     private javax.swing.JButton jButton_ok;
+    private javax.swing.JCheckBox jCheckBox_anonymous;
     private javax.swing.JCheckBox jCheckBox_blockDirChung;
     private javax.swing.JCheckBox jCheckBox_blockDirUser;
     private javax.swing.JCheckBox jCheckBox_block_down;
@@ -713,8 +772,6 @@ class transferfile extends Thread {
 
     public void receiveFile(String user, String url) throws FileNotFoundException, IOException {
 
-//        in = socket.getInputStream(); // nhận file 
-        //C:\Users\theph\OneDrive\Máy tính\test.txt
         StringTokenizer st = new StringTokenizer(url, "\\");
         String nameFile = null;
         while (st.hasMoreTokens()) {
@@ -758,6 +815,110 @@ class transferfile extends Thread {
             System.out.println("Server đã nhận file");
         }
 
+    }
+
+    public void receiveFileToDirChung(String nameDir, String url, String username, String anonymous) throws FileNotFoundException, IOException {
+
+        StringTokenizer st = new StringTokenizer(url, "\\");
+        String nameFile = null;
+        while (st.hasMoreTokens()) {
+
+            nameFile = st.nextToken(); //lấy tên file
+        }
+        if (anonymous.equals("anonymous")) {
+            if (!checkAnonymous(username)) {
+                dout.writeUTF("Bạn đã bị block chức năng anonymous");
+                dout.flush();
+
+            } else {
+                File f = new File(".\\FILE-SERVER\\" + nameDir + "\\" + nameFile);
+                if (f.exists()) {
+                    dout.writeUTF("file_exists");
+                    dout.flush();
+                    String message = din.readUTF();
+                    if (message.equals("ghi_de")) {
+                        FileOutputStream fout = new FileOutputStream(f);
+                        int ch;
+                        String temp;
+                        do {
+                            temp = din.readUTF();
+                            ch = Integer.parseInt(temp);
+                            if (ch != -1) {
+                                fout.write(ch);
+                            }
+                        } while (ch != -1);
+                        fout.close();
+                        System.out.println("Server đã nhận file");
+
+                        updateLogDirChung(nameFile, String.valueOf(f.length()), anonymous);
+
+                    }
+
+                } else {
+                    dout.writeUTF("file_not_exists");
+                    dout.flush();
+                    FileOutputStream fout = new FileOutputStream(f);
+                    int ch;
+                    String temp;
+                    do {
+                        temp = din.readUTF();
+                        ch = Integer.parseInt(temp);
+                        if (ch != -1) {
+                            fout.write(ch);
+                        }
+                    } while (ch != -1);
+                    fout.close();
+                    System.out.println("Server đã nhận file");
+
+                    writeLogDirChung(nameFile, String.valueOf(f.length()), anonymous);
+
+                }
+
+            }
+        } else {
+            File f = new File(".\\FILE-SERVER\\" + nameDir + "\\" + nameFile);
+            if (f.exists()) {
+                dout.writeUTF("file_exists");
+                dout.flush();
+                String message = din.readUTF();
+                if (message.equals("ghi_de")) {
+                    FileOutputStream fout = new FileOutputStream(f);
+                    int ch;
+                    String temp;
+                    do {
+                        temp = din.readUTF();
+                        ch = Integer.parseInt(temp);
+                        if (ch != -1) {
+                            fout.write(ch);
+                        }
+                    } while (ch != -1);
+                    fout.close();
+                    System.out.println("Server đã nhận file");
+
+                    updateLogDirChung(nameFile, String.valueOf(f.length()), username);
+
+                }
+
+            } else {
+                dout.writeUTF("file_not_exists");
+                dout.flush();
+                FileOutputStream fout = new FileOutputStream(f);
+                int ch;
+                String temp;
+                do {
+                    temp = din.readUTF();
+                    ch = Integer.parseInt(temp);
+                    if (ch != -1) {
+                        fout.write(ch);
+                    }
+                } while (ch != -1);
+                fout.close();
+                System.out.println("Server đã nhận file");
+
+                writeLogDirChung(nameFile, String.valueOf(f.length()), username);
+
+            }
+        }
     }
 
     public void sendFile(String user, String dir, String nameFile) {
@@ -852,7 +1013,7 @@ class transferfile extends Thread {
         }
         //ghi file quyen_user
         try {
-            String content = name_user + ";yes;yes;yes;yes;1000;100;100\n";
+            String content = name_user + ";yes;yes;yes;yes;1000;100;100;yes\n";
             //Specify the file name and path here
             File file = new File(".\\src\\ftp\\ltm\\quyen_user.txt");
 
@@ -887,15 +1048,42 @@ class transferfile extends Thread {
         }
     }
 
-    private String loadDirForUser(String user) {
-        String url = ".\\FILE-SERVER\\" + user;
-        File dir = new File(url);
-        String[] listFiles = dir.list();
-        String listFile = "";
-        for (int i = 0; i < listFiles.length; i++) {
-            listFile += listFiles[i] + ":";
+    private String loadDirForUser(String user) throws FileNotFoundException {
+        if (!user.equals("chung")) {
+            String url = ".\\FILE-SERVER\\" + user;
+            File dir = new File(url);
+            String[] listFiles = dir.list();
+            String listFile = "";
+            File file = null;
+            for (int i = 0; i < listFiles.length; i++) {
+                file = new File(".\\FILE-SERVER\\" + user + "\\" + listFiles[i]);
+                listFile += listFiles[i] + ";" + file.length() + ":"; // ten fiel ; kich thuoc file:ten fiel ; kich thuoc file
+            }
+            System.out.println(listFile);
+            return listFile;
+        } else {
+            String url = ".\\src\\ftp\\ltm\\logDirChung.txt";
+            // Đọc dữ liệu từ File với Scanner
+            FileInputStream fileInputStream = new FileInputStream(url);
+            Scanner scanner = new Scanner(fileInputStream);
+            String listFile = "";
+
+            try {
+                while (scanner.hasNextLine()) {
+                    listFile += scanner.nextLine() + ":";
+                }
+
+            } finally {
+                try {
+                    scanner.close();
+                    fileInputStream.close();
+                } catch (IOException ex) {
+
+                }
+            }
+            return listFile;
         }
-        return listFile;
+
     }
 
     public boolean checkUP(String username) throws FileNotFoundException {
@@ -1034,6 +1222,29 @@ class transferfile extends Thread {
         }
     }
 
+    public boolean checkAnonymous(String username) throws FileNotFoundException {
+        if (username.equals("anonymous")) {
+            return true;
+        } else {
+            loadHashMap();
+            String quyen = mapQuyenUser.get(username);
+            StringTokenizer st = new StringTokenizer(quyen, ";");
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            st.nextToken();
+            String anonymous = st.nextToken();
+            if (anonymous.equals("yes")) {
+                return true;
+            }
+            return false;
+        }
+    }
+
     private static long getFolderSize(File folder) {
         long length = 0;
 
@@ -1058,6 +1269,51 @@ class transferfile extends Thread {
         File file = new File(".\\FILE-SERVER\\" + username + "\\" + nameFile);
 
         return (int) file.length();
+    }
+
+    public void writeLogDirChung(String nameFile, String sizeFile, String username) {
+        try {
+
+            //Specify the file name and path here
+            File file = new File(".\\src\\ftp\\ltm\\logDirChung.txt");
+
+            /* This logic is to create the file if the
+         * file is not already present
+             */
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            //Here true is to append the content to file
+            FileWriter fw = new FileWriter(file, true);
+            //BufferedWriter writer give better performance
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(nameFile + ";" + sizeFile + ";" + username + "\n");
+            //Closing BufferedWriter Stream
+            bw.close();
+
+            System.out.println("Đã ghi log dir chung");
+            loadHashMap();
+
+        } catch (IOException ioe) {
+            System.out.println("Exception occurred:");
+            ioe.printStackTrace();
+        }
+
+    }
+
+    public void updateLogDirChung(String nameFile, String sizeFile, String sender) {
+        mapLogDirChung.put(nameFile, nameFile + ";" + sizeFile + ";" + sender);
+        try {
+            FileWriter fw = new FileWriter(".\\src\\ftp\\ltm\\logDirChung.txt");
+            Set<String> keySet = mapLogDirChung.keySet();
+            for (String key : keySet) {
+                fw.write(mapLogDirChung.get(key) + "\n");
+            }
+            fw.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     public void run() {
@@ -1166,8 +1422,11 @@ class transferfile extends Thread {
                                 } else {
                                     dout.writeUTF("ok");
                                     dout.flush();
+                                    String anonymous = din.readUTF(); // phương thức gửi ẩn danh hay ko 
+                                    String username = din.readUTF();
+
                                     String urlFile = din.readUTF();
-                                    receiveFile(nameDir, urlFile);
+                                    receiveFileToDirChung(nameDir, urlFile, username, anonymous);
                                 }
                             } else {
                                 dout.writeUTF("blockdir");

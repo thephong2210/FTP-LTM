@@ -1,3 +1,2 @@
-thephong1412@gmail.com;yes;yes;yes;yes;10;1001;1001
-laxitek363@veb27.com;yes;yes;yes;yes;100022;10012;100121
-thuongmen@yopmail.com;yes;yes;yes;yes;1000;100;100
+thephong1412@gmail.com;yes;yes;yes;yes;1011;1001;1001;yes
+laxitek363@veb27.com;yes;yes;yes;yes;1000;100;100;yes
