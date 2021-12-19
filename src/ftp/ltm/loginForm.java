@@ -35,7 +35,7 @@ public class loginForm extends javax.swing.JFrame {
     public void start(Socket s) {
         try {
             if (s == null) {
-                socket = new Socket("171.250.246.104", 2210); //171.250.246.104 nat port
+                socket = new Socket("localhost", 2210); //171.250.246.104 nat port
             } else {
                 socket = s;
             }
