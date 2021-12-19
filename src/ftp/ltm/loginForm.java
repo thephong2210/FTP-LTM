@@ -69,7 +69,7 @@ public class loginForm extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("FTP -Đang nhập");
+        setTitle("FTP - Đăng nhập");
         setLocation(new java.awt.Point(50, 50));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 3, 35)); // NOI18N
