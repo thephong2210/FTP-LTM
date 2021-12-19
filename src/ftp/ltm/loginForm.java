@@ -31,11 +31,11 @@ public class loginForm extends javax.swing.JFrame {
         start(s);
     }
 
-    //27.74.196.100
+    //171.250.246.104
     public void start(Socket s) {
         try {
             if (s == null) {
-                socket = new Socket("localhost", 2210); //27.74.196.100 nat port
+                socket = new Socket("171.250.246.104", 2210); //171.250.246.104 nat port
             } else {
                 socket = s;
             }

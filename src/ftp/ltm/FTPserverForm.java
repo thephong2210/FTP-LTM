@@ -296,6 +296,7 @@ public final class FTPserverForm extends javax.swing.JFrame {
         if (jTextField_dungluong.getText().equals("") || jTextField_maxDOWN.getText().equals("") || jTextField_maxUP.getText().equals("")) {
             return false;
         }
+
         String regex = "\\d*";
         // String ms = "";
         Pattern pattern = Pattern.compile(regex);
@@ -312,6 +313,18 @@ public final class FTPserverForm extends javax.swing.JFrame {
         }
         if (!matcher2.matches()) {
 
+            return false;
+        }
+        long dungluong = Long.parseLong(jTextField_dungluong.getText());
+        long maxUP = Long.parseLong(jTextField_maxUP.getText());
+        long maxDOWN = Long.parseLong(jTextField_maxDOWN.getText());
+        if (dungluong > 1000000) {
+            return false;
+        }
+        if (maxUP > 1000000) {
+            return false;
+        }
+        if (maxDOWN > 1000000) {
             return false;
         }
 
@@ -372,7 +385,7 @@ public final class FTPserverForm extends javax.swing.JFrame {
                     Logger.getLogger(FTPserverForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Chỉ được nhập số lớn hơn 0");
+                JOptionPane.showMessageDialog(this, "Chỉ được nhập từ 0 --> 1000000");
             }
         }
     }//GEN-LAST:event_jButton_okActionPerformed
@@ -495,10 +508,10 @@ public final class FTPserverForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                server.setVisible(true);           
+                server.setVisible(true);
             }
         });
-        
+
         server.StartServer(2210);
     }
 
@@ -938,7 +951,7 @@ class transferfile extends Thread {
 
                 int sizeFile = (int) file.length();
 
-                int MaxDown = checkMaxDown(user);
+                long MaxDown = checkMaxDown(user);
 
                 System.out.println("sizeFile " + sizeFile);
                 System.out.println("MaxDown " + MaxDown);
@@ -1154,7 +1167,7 @@ class transferfile extends Thread {
         return false;
     }
 
-    public int checkDungLuongTrong(String username) throws FileNotFoundException {
+    public long checkDungLuongTrong(String username) throws FileNotFoundException {
         loadHashMap();
         String quyen = mapQuyenUser.get(username);
         StringTokenizer st = new StringTokenizer(quyen, ";");
@@ -1163,13 +1176,13 @@ class transferfile extends Thread {
         st.nextToken();
         st.nextToken();
         st.nextToken();
-        int dungluong = Integer.valueOf(st.nextToken());
+        long dungluong = Integer.valueOf(st.nextToken());
         System.out.println(dungluong);
 
         File dir = new File(".\\FILE-SERVER\\" + username);
-        int dungluongUsed = (int) getFolderSize(dir);
+        long dungluongUsed = getFolderSize(dir);
         System.out.println("dung lượng đã sử dụng: " + dungluongUsed);
-        int dungluong_conlai = dungluong - dungluongUsed;
+        long dungluong_conlai = dungluong - dungluongUsed;
 
         if (dungluong_conlai < 0) {
             dungluong_conlai = 0;
@@ -1179,7 +1192,7 @@ class transferfile extends Thread {
         return dungluong_conlai;
     }
 
-    public int checkMaxUP(String username) throws FileNotFoundException {
+    public long checkMaxUP(String username) throws FileNotFoundException {
         if (username.equals("anonymous")) {
             return 50;
         } else {
@@ -1192,14 +1205,14 @@ class transferfile extends Thread {
             st.nextToken();
             st.nextToken();
             st.nextToken();
-            int maxUP = Integer.valueOf(st.nextToken());
+            long maxUP = Integer.valueOf(st.nextToken());
             System.out.println("max up: " + maxUP);
 
             return maxUP;
         }
     }
 
-    public int checkMaxDown(String username) throws FileNotFoundException {
+    public long checkMaxDown(String username) throws FileNotFoundException {
         if (username.equals("anonymous")) {
             return 50;
         } else {
@@ -1213,7 +1226,7 @@ class transferfile extends Thread {
             st.nextToken();
             st.nextToken();
             st.nextToken();
-            int maxDOWN = Integer.valueOf(st.nextToken());
+            long maxDOWN = Integer.valueOf(st.nextToken());
             System.out.println("max down: " + maxDOWN);
 
             return maxDOWN;
